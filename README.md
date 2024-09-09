@@ -1,28 +1,30 @@
-# RDO Manager
+# 🛠️ RDO Manager
 
-## Descrição
+**RDO Manager** é uma aplicação interna desenvolvida para a empresa **Projeta Engenharia**, com o objetivo de automatizar e gerenciar o processo de criação e envio de Relatórios Diários de Obras (RDO). O sistema permite que os usuários preencham formulários com informações detalhadas sobre o andamento das obras, gerem PDFs estilizados a partir dos dados inseridos e façam o download dos documentos gerados.
 
-O **RDO Manager** é uma solução web moderna para o gerenciamento e geração de Relatórios Diários de Obras (RDO). A ferramenta permite que engenheiros e gerentes de projetos preencham facilmente um formulário detalhado sobre o andamento das obras, gerando automaticamente um PDF estilizado com todas as informações inseridas. A aplicação é simples de usar e agiliza o processo de criação de documentos essenciais para o acompanhamento diário de obras.
+## ✨ Funcionalidades
 
-## Funcionalidades
+- 📄 **Criação de Relatórios Diários de Obras (RDO):** Preenchimento de informações como número do contrato, obra, cliente, horas trabalhadas, atividades diárias e mais.
+- 🖨️ **Geração de PDF estilizado:** Gera PDFs automaticamente com base nas informações fornecidas no formulário.
+- 📥 **Download de PDFs:** Permite o download do relatório gerado em formato PDF.
+- ⚙️ **Integração com API:** Utiliza APIs para gerar e manipular o PDF.
 
-- **Formulário Dinâmico**: Coleta informações completas sobre o progresso da obra, como horários, atividades realizadas, condições do clima e observações do fiscal.
-- **Geração de PDF**: Converte os dados preenchidos no formulário em um PDF formatado e estilizado automaticamente.
-- **Download Imediato**: Permite o download do PDF diretamente pela interface do sistema.
-- **Notificações**: Exibe feedback visual com notificações de sucesso ou erro ao gerar o PDF.
+## 🛠️ Tecnologias Utilizadas
 
-## Tecnologias Utilizadas
+- ⚛️ **Next.js:** Framework de React para criação de interfaces do usuário.
+- 🚀 **React:** Biblioteca JavaScript para construção de interfaces dinâmicas.
+- 📚 **TypeScript:** Superset do JavaScript que adiciona tipos estáticos.
+- 🖨️ **PDF.co API:** API para conversão de HTML em PDFs.
+- 🤖 **Puppeteer (planejado):** Utilitário para automação de navegador para geração de PDFs diretamente da página HTML.
+- 🔗 **Axios:** Biblioteca para requisições HTTP.
 
-- **Next.js**: Framework de React para aplicações web com SSR (Server Side Rendering).
-- **React**: Biblioteca JavaScript para construção de interfaces interativas.
-- **Puppeteer**: Utilizado para renderização do HTML e geração de PDFs automatizados.
-- **PDF.co API**: Integração com serviço de geração de PDFs a partir de conteúdo HTML.
-- **React Toastify**: Notificações simples e elegantes.
-- **React DatePicker**: Componente para seleção de datas no formulário.
-- **Axios**: Biblioteca para fazer requisições HTTP.
-- **TypeScript**: Linguagem utilizada para melhorar a qualidade do código e prever erros.
+## 👉 Como Executar o Projeto
 
-## Pré-requisitos
+### ⚙️ Pré-requisitos
 
-- Node.js (versão 14 ou superior)
-- npm ou yarn para gerenciamento de pacotes
+Antes de começar, você precisará ter as seguintes ferramentas instaladas em sua máquina:
+
+- [Node.js](https://nodejs.org/en/)
+- [npm](https://www.npmjs.com/get-npm)
+
+**🔒Este projeto é propriedade da Projeta Engenharia. Uso externo ou distribuição não são permitidos sem autorização.**
