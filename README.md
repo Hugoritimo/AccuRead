@@ -1,4 +1,4 @@
-# 🛠️ RDO Manager
+# 🛠️ AccuRead
 
 **RDO Manager** é uma aplicação interna desenvolvida para a empresa **Projeta Engenharia**, com o objetivo de automatizar e gerenciar o processo de criação e envio de Relatórios Diários de Obras (RDO). O sistema permite que os usuários preencham formulários com informações detalhadas sobre o andamento das obras, gerem PDFs estilizados a partir dos dados inseridos e façam o download dos documentos gerados.
 
