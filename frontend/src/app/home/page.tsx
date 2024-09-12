@@ -58,7 +58,10 @@ const HomePage = () => {
 
       {/* Footer */}
       <footer className="w-full max-w-5xl mt-12 text-center text-[#666666]">
-        <p>&copy; 2024 Projeta. Todos os direitos reservados.</p>
+        <p>
+          &copy; 2024 Projeta. <br></br>
+          Todos os direitos reservados.
+        </p>
       </footer>
     </div>
   );

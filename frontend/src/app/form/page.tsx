@@ -2,19 +2,19 @@
 
 import React, { useReducer, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import jsPDF from "jspdf";
 import Image from "next/image";
 
 // Componentes UI
 import { TooltipProvider } from "@radix-ui/react-tooltip";
-import { Button } from "@/components/ui/Button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
-import { Input } from "@/components/ui/Input";
-import { Label } from "@/components/ui/Label";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import InputField from "@/components/InputField";
 import SelectField from "@/components/SelectField";
 import TextareaField from "@/components/TextareaField";
@@ -75,6 +75,7 @@ const FormPage: React.FC = () => {
   const router = useRouter();
   const [state, dispatch] = useReducer(formReducer, initialState);
   const [company, setCompany] = useState<string | null>(null);
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
 
   useEffect(() => {
     const selectedCompany = localStorage.getItem("selectedCompany");
@@ -104,10 +105,12 @@ const FormPage: React.FC = () => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      generatePDF();
+      const pdfBlob = await generatePDF();
+      const pdfDownloadUrl = URL.createObjectURL(pdfBlob);
+      setPdfUrl(pdfDownloadUrl);
       toast.success("PDF gerado com sucesso!");
       dispatch({ type: "RESET" });
     } catch (error) {
@@ -116,109 +119,70 @@ const FormPage: React.FC = () => {
     }
   };
 
-  const generatePDF = () => {
-    const pdf = new jsPDF("portrait", "mm", "a4");
+  const generatePDF = async () => {
+    const htmlContent = `
+      <html>
+        <head>
+          <style>
+            body { font-family: Arial, sans-serif; font-size: 12px; }
+            h1 { font-size: 18px; text-align: center; }
+            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+            th { background-color: #f2f2f2; }
+          </style>
+        </head>
+        <body>
+          <h1>Relatório Diário de Obras</h1>
+          <p>Empresa: ${company || "N/A"}</p>
+          <p>Data: ${state.data ? state.data.toLocaleDateString() : "N/A"}</p>
+          <table>
+            <tr><th>Número do RDO</th><td>${state.numeroRDO}</td></tr>
+            <tr><th>Gerência</th><td>${state.gerencia}</td></tr>
+            <tr><th>Objeto</th><td>${state.objeto}</td></tr>
+            <tr><th>Contrato</th><td>${state.contrato}</td></tr>
+            <tr><th>Obra</th><td>${state.obra}</td></tr>
+            <tr><th>Contratante</th><td>${state.contratante}</td></tr>
+            <tr><th>Responsável</th><td>${state.responsavel}</td></tr>
+            <tr><th>Data de Início da Obra</th><td>${
+              state.dataInicioObra
+                ? state.dataInicioObra.toLocaleDateString()
+                : "N/A"
+            }</td></tr>
+            <tr><th>Data de Término da Obra</th><td>${
+              state.dataTerminoObra
+                ? state.dataTerminoObra.toLocaleDateString()
+                : "N/A"
+            }</td></tr>
+            <tr><th>Horas Trabalhadas</th><td>${
+              state.horasTrabalhadas
+            }</td></tr>
+            <tr><th>Disciplina</th><td>${state.disciplina}</td></tr>
+            <tr><th>Local da Obra</th><td>${state.localObra}</td></tr>
+            <tr><th>Atividades Diárias</th><td>${
+              state.atividadesDiarias
+            }</td></tr>
+            <tr><th>Observações da Fiscalização</th><td>${
+              state.observacoesFiscalizacao
+            }</td></tr>
+            <tr><th>Observações da Contratada</th><td>${
+              state.observacoesContratada
+            }</td></tr>
+          </table>
+        </body>
+      </html>
+    `;
 
-    // Cabeçalho
-    pdf.addImage(getCompanyLogo(), "PNG", 10, 10, 50, 20);
-    pdf.setFontSize(16);
-    pdf.text("Relatório Diário de Obras", 70, 20);
-    pdf.setFontSize(12);
-    pdf.text(`Empresa: ${company}`, 70, 30);
-    pdf.text(
-      `Data: ${state.data ? state.data.toLocaleDateString() : "N/A"}`,
-      70,
-      35
+    const response = await axios.post(
+      "http://localhost:3000/generate-pdf",
+      {
+        htmlContent,
+      },
+      {
+        responseType: "blob",
+      }
     );
 
-    // Informações Iniciais
-    pdf.setFontSize(14);
-    pdf.text("Informações Iniciais", 10, 50);
-    pdf.setFontSize(12);
-    pdf.text(`Número do RDO: ${state.numeroRDO}`, 10, 60);
-    pdf.text(`Gerência: ${state.gerencia}`, 10, 65);
-    pdf.text(`Objeto: ${state.objeto}`, 10, 70);
-    pdf.text(`Contrato: ${state.contrato}`, 10, 75);
-    pdf.text(`Obra: ${state.obra}`, 10, 80);
-    pdf.text(`Contratante: ${state.contratante}`, 10, 85);
-    pdf.text(`Responsável: ${state.responsavel}`, 10, 90);
-
-    // Detalhes da Obra
-    pdf.setFontSize(14);
-    pdf.text("Detalhes da Obra", 10, 100);
-    pdf.setFontSize(12);
-    pdf.text(
-      `Data Início da Obra: ${
-        state.dataInicioObra ? state.dataInicioObra.toLocaleDateString() : "N/A"
-      }`,
-      10,
-      110
-    );
-    pdf.text(
-      `Data Término da Obra: ${
-        state.dataTerminoObra
-          ? state.dataTerminoObra.toLocaleDateString()
-          : "N/A"
-      }`,
-      10,
-      115
-    );
-    pdf.text(`Horas Trabalhadas: ${state.horasTrabalhadas}`, 10, 120);
-    pdf.text(`Tempo Manhã: ${state.tempoManha}`, 10, 125);
-    pdf.text(`Tempo Tarde: ${state.tempoTarde}`, 10, 130);
-    pdf.text(`Disciplina: ${state.disciplina}`, 10, 135);
-    pdf.text(`Local da Obra: ${state.localObra}`, 10, 140);
-
-    // Efetivo e Equipamentos
-    pdf.setFontSize(14);
-    pdf.text("Efetivo e Equipamentos", 10, 150);
-    pdf.setFontSize(12);
-    pdf.text(`Quantidade de Efetivo: ${state.qtdEfetivo}`, 10, 160);
-    pdf.text(`Quantidade de Equipamentos: ${state.qtdEquipamentos}`, 10, 165);
-
-    // Atividades Diárias e Observações
-    pdf.setFontSize(14);
-    pdf.text("Atividades Diárias e Observações", 10, 175);
-    pdf.setFontSize(12);
-    pdf.text(
-      `Horário de Chegada da Equipe: ${state.horarioChegadaEquipe}`,
-      10,
-      185
-    );
-    pdf.text(`Horário de DDS: ${state.horarioDDS}`, 10, 190);
-    pdf.text(`Chegada do Fiscal: ${state.chegadaFiscal}`, 10, 195);
-    pdf.text(`Nome e Empresa do Fiscal: ${state.nomeFiscal}`, 10, 200);
-    pdf.text(`Horário de Liberação: ${state.liberacaoFrenteServico}`, 10, 205);
-    pdf.text(`Início das Atividades: ${state.inicioAtividades}`, 10, 210);
-    pdf.text(`Almoço Saída: ${state.almocoSaida}`, 10, 215);
-    pdf.text(`Almoço Retorno: ${state.almocoRetorno}`, 10, 220);
-    pdf.text(
-      `Finalização das Atividades: ${state.finalizacaoAtividades}`,
-      10,
-      225
-    );
-    pdf.text(`Saída do Canteiro: ${state.saidaCanteiro}`, 10, 230);
-
-    // Descrição das Atividades
-    pdf.text("Atividades Diárias:", 10, 240);
-    pdf.text(`${state.atividadesDiarias}`, 10, 245, {
-      maxWidth: 190,
-    });
-
-    // Observações
-    pdf.text("Observações da Fiscalização:", 10, 260);
-    pdf.text(`${state.observacoesFiscalizacao}`, 10, 265, {
-      maxWidth: 190,
-    });
-
-    pdf.addPage();
-    pdf.text("Observações da Contratada:", 10, 20);
-    pdf.text(`${state.observacoesContratada}`, 10, 25, {
-      maxWidth: 190,
-    });
-
-    // Salvando o PDF
-    pdf.save(`RDO_${state.numeroRDO || "documento"}.pdf`);
+    return new Blob([response.data], { type: "application/pdf" });
   };
 
   const getCompanyLogo = () => {
@@ -567,6 +531,15 @@ const FormPage: React.FC = () => {
                 >
                   Voltar
                 </Button>
+                {pdfUrl && (
+                  <Button
+                    type="button"
+                    className="bg-green-600 hover:bg-green-700 text-white w-full md:w-auto"
+                    onClick={() => window.open(pdfUrl, "_blank")}
+                  >
+                    Baixar PDF
+                  </Button>
+                )}
               </div>
             </form>
           </CardContent>

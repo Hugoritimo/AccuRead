@@ -16,35 +16,39 @@ const RegisterPage: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState<string>("");
   const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (username === "" || password === "" || confirmPassword === "") {
+    if (!username || !email) {
       toast.error("Por favor, preencha todos os campos.");
       return;
     }
 
-    if (password !== confirmPassword) {
-      toast.error("As senhas não coincidem.");
-      return;
+    try {
+      const response = await fetch(
+        "http://localhost:3001/api/request-user-creation",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            username,
+            email,
+          }),
+        }
+      );
+
+      if (response.ok) {
+        toast.success("Solicitação enviada com sucesso! Verifique seu e-mail.");
+      } else {
+        const result = await response.json();
+        toast.error(result.message || "Erro ao enviar solicitação.");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Erro ao enviar solicitação.");
     }
-
-    const users = JSON.parse(localStorage.getItem("users") || "[]");
-
-    const userExists = users.find(
-      (user: { username: string }) => user.username === username
-    );
-
-    if (userExists) {
-      toast.error("Usuário já existe.");
-      return;
-    }
-
-    users.push({ username, password });
-    localStorage.setItem("users", JSON.stringify(users));
-
-    toast.success("Registro bem-sucedido!");
-    router.push("/");
   };
 
   return (

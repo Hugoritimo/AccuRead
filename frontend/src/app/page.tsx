@@ -16,13 +16,15 @@ export default function LoginPage() {
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [rememberMe, setRememberMe] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
 
     try {
-      const response = await fetch("/api/authenticate", {
+      const response = await fetch("http://localhost:3001/api/authenticate", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -34,7 +36,9 @@ export default function LoginPage() {
         const result = await response.json();
         if (result.success) {
           toast.success("Login bem-sucedido!");
-          router.push("/home");
+          setTimeout(() => {
+            router.push("/home"); // Redireciona para a página principal
+          }, 1000); // Atraso para exibir a notificação de sucesso
         } else {
           toast.error(result.message || "Nome de usuário ou senha incorretos");
         }
@@ -45,6 +49,8 @@ export default function LoginPage() {
       console.error(error);
       toast.error("Erro ao tentar fazer login, tente novamente.");
     }
+
+    setIsLoading(false);
   };
 
   return (
@@ -82,7 +88,7 @@ export default function LoginPage() {
                   htmlFor="username"
                   className="block text-sm font-medium text-brand-dark dark:text-brand-white mb-1"
                 >
-                  Nome de Usuário
+                  Nome de Usuário <br></br>
                 </Label>
                 <Input
                   id="username"
@@ -133,8 +139,9 @@ export default function LoginPage() {
                 <Button
                   type="submit"
                   className="w-full bg-brand-primary hover:bg-brand-secondary text-white font-semibold py-3 px-4 rounded-xl shadow-lg transition duration-300 dark:bg-brand-primary dark:hover:bg-brand-secondary"
+                  disabled={isLoading}
                 >
-                  Entrar
+                  {isLoading ? "Carregando..." : "Entrar"}
                 </Button>
               </motion.div>
             </form>
