@@ -12,6 +12,7 @@ import Image from "next/image";
 
 const RegisterPage: React.FC = () => {
   const [username, setUsername] = useState<string>("");
+  const [email, setEmail] = useState<string>(""); // Adicionando o campo de e-mail
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
   const router = useRouter();
@@ -19,8 +20,15 @@ const RegisterPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!username || !email) {
+    // Validação para campos vazios
+    if (!username || !email || !password || !confirmPassword) {
       toast.error("Por favor, preencha todos os campos.");
+      return;
+    }
+
+    // Validação para senhas
+    if (password !== confirmPassword) {
+      toast.error("As senhas não correspondem.");
       return;
     }
 
@@ -35,12 +43,14 @@ const RegisterPage: React.FC = () => {
           body: JSON.stringify({
             username,
             email,
+            password, // Enviando a senha também
           }),
         }
       );
 
       if (response.ok) {
         toast.success("Solicitação enviada com sucesso! Verifique seu e-mail.");
+        router.push("/"); // Redirecionando para a página inicial
       } else {
         const result = await response.json();
         toast.error(result.message || "Erro ao enviar solicitação.");
@@ -89,6 +99,26 @@ const RegisterPage: React.FC = () => {
                 aria-required="true"
               />
             </div>
+
+            <div className="mb-6">
+              <Label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                E-mail
+              </Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="Digite seu e-mail"
+                className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                aria-required="true"
+              />
+            </div>
+
             <div className="mb-6">
               <Label
                 htmlFor="password"
@@ -107,6 +137,7 @@ const RegisterPage: React.FC = () => {
                 aria-required="true"
               />
             </div>
+
             <div className="mb-6">
               <Label
                 htmlFor="confirmPassword"
@@ -125,6 +156,7 @@ const RegisterPage: React.FC = () => {
                 aria-required="true"
               />
             </div>
+
             <Button
               type="submit"
               className="w-full bg-[#af1b1b] hover:bg-red-700 text-white font-semibold py-3 px-4 rounded-xl shadow-lg transition duration-300"
