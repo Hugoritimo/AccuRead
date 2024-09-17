@@ -23,7 +23,8 @@ const NotificationsPage = () => {
     loadNotifications();
   }, []);
 
-  const markAsRead = async (id) => {
+  // Define o tipo de 'id' como string ou number
+  const markAsRead = async (id: string | number) => {
     try {
       await axios.patch(`/api/notifications/${id}/read`);
       setNotifications(
@@ -34,7 +35,8 @@ const NotificationsPage = () => {
     }
   };
 
-  const deleteNotification = async (id) => {
+  // Define o tipo de 'id' como string ou number
+  const deleteNotification = async (id: string | number) => {
     try {
       await axios.delete(`/api/notifications/${id}`);
       setNotifications(notifications.filter((n) => n.id !== id));
