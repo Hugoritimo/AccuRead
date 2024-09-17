@@ -85,21 +85,17 @@ const NavigationMenu = () => {
         onClick={() => router.push("/profile")}
         className="flex flex-col items-center text-gray-600 hover:text-indigo-600 cursor-pointer"
       >
-        <svg
+       <svg
           className="icon"
           stroke="currentColor"
-          fill="none"
-          strokeWidth="2"
+          fill="currentColor"
+          strokeWidth="0"
           viewBox="0 0 24 24"
-          strokeLinecap="round"
-          strokeLinejoin="round"
           height="1.2em"
           width="1.2em"
           xmlns="http://www.w3.org/2000/svg"
         >
-          <circle cx="9" cy="21" r="1"></circle>
-          <circle cx="20" cy="21" r="1"></circle>
-          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+          <path d="M12 2.5a5.5 5.5 0 0 1 3.096 10.047 9.005 9.005 0 0 1 5.9 8.181.75.75 0 1 1-1.499.044 7.5 7.5 0 0 0-14.993 0 .75.75 0 0 1-1.5-.045 9.005 9.005 0 0 1 5.9-8.18A5.5 5.5 0 0 1 12 2.5ZM8 8a4 4 0 1 0 8 0 4 4 0 0 0-8 0Z"></path>
         </svg>
         <span className="text-xs">Perfil</span>
       </motion.div>

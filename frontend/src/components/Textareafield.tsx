@@ -1,5 +1,4 @@
 import React from "react";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 
 interface TextareaFieldProps {
@@ -7,7 +6,7 @@ interface TextareaFieldProps {
   name: string;
   value: string;
   onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
-  icon: JSX.Element;
+  required?: boolean; // Tornando 'required' opcional
 }
 
 const TextareaField: React.FC<TextareaFieldProps> = ({
@@ -15,19 +14,22 @@ const TextareaField: React.FC<TextareaFieldProps> = ({
   name,
   value,
   onChange,
-  icon,
+  required = false, // Definindo valor padrão para 'required'
 }) => (
   <div className="mb-4">
-    <Label className="block text-sm font-medium mb-2 text-gray-700 items-center">
-      {icon}
-      <span className="ml-2">{label}</span>
+    <Label
+      htmlFor={name}
+      className="block text-sm font-medium mb-2 text-gray-700"
+    >
+      {label}
     </Label>
-    <Textarea
+    <textarea
+      id={name}
       name={name}
-      placeholder={label}
-      className="w-full border-gray-300 focus:border-indigo-600 focus:ring focus:ring-indigo-600 focus:ring-opacity-50"
       value={value}
       onChange={onChange}
+      required={required} // Passando a propriedade 'required'
+      className="w-full p-2 border border-gray-300 rounded"
     />
   </div>
 );
