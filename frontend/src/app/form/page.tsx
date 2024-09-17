@@ -17,7 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import InputField from "@/components/InputField";
 import SelectField from "@/components/SelectField";
-import TextareaField from "@/components/TextareaField"; // Corrigido com a capitalização correta
+import TextareaField from "@/components/Textareafield"; // Corrigido com a capitalização correta
 
 // Tipos do estado e da ação
 interface FormState {
