@@ -8,6 +8,19 @@ import {
   Image,
 } from "@react-pdf/renderer";
 
+// Define a interface para os dados do formulário
+interface FormData {
+  numeroContrato: string;
+  nomeObra: string;
+  cliente: string;
+  data: string;
+  horasTrabalhadas: string;
+  tempoManha: string;
+  tempoTarde: string;
+  observacoesFiscalizacao: string;
+  observacoesContratada: string;
+}
+
 // Create styles
 const styles = StyleSheet.create({
   page: {
@@ -43,11 +56,10 @@ const styles = StyleSheet.create({
 });
 
 // Create Document Component
-const RelatorioPDF = ({ formData }) => (
+const RelatorioPDF: React.FC<{ formData: FormData }> = ({ formData }) => (
   <Document>
     <Page size="A4" style={styles.page}>
       <View style={styles.section}>
-        {/* Usar uma URL válida para a imagem */}
         <Image style={styles.image} src="https://example.com/img/projeta.png" />
         <Text style={styles.title}>Relatório Diário de Obras</Text>
         <Text style={styles.header}>Dados da Obra</Text>
@@ -60,7 +72,6 @@ const RelatorioPDF = ({ formData }) => (
         <Text style={styles.text}>Cliente: {formData.cliente || "N/A"}</Text>
         <Text style={styles.text}>Data: {formData.data || "N/A"}</Text>
       </View>
-
       <View style={styles.section}>
         <Text style={styles.header}>Detalhes do Trabalho</Text>
         <Text style={styles.text}>
@@ -80,7 +91,6 @@ const RelatorioPDF = ({ formData }) => (
           Observações da Contratada: {formData.observacoesContratada || "N/A"}
         </Text>
       </View>
-
       <View style={styles.signature}>
         <Text>___________________________________</Text>
         <Text>Assinatura</Text>
