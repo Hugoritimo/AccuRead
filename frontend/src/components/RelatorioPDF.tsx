@@ -35,45 +35,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     textAlign: "center",
   },
-  table: {
-    display: "table",
-    width: "auto",
-    margin: "auto",
-    borderStyle: "solid",
-    borderWidth: 1,
-    borderColor: "#bfbfbf",
-    borderRightWidth: 0,
-    borderBottomWidth: 0,
-  },
-  tableRow: {
-    flexDirection: "row",
-  },
-  tableColHeader: {
-    width: "25%",
-    borderStyle: "solid",
-    borderWidth: 1,
-    borderColor: "#bfbfbf",
-    borderLeftWidth: 0,
-    borderTopWidth: 0,
-    backgroundColor: "#f2f2f2",
-  },
-  tableCol: {
-    width: "25%",
-    borderStyle: "solid",
-    borderWidth: 1,
-    borderColor: "#bfbfbf",
-    borderLeftWidth: 0,
-    borderTopWidth: 0,
-  },
-  tableCellHeader: {
-    margin: 5,
-    fontSize: 10,
-    fontWeight: "bold",
-  },
-  tableCell: {
-    margin: 5,
-    fontSize: 10,
-  },
   signature: {
     marginTop: 50,
     fontSize: 12,
@@ -86,30 +47,40 @@ const RelatorioPDF = ({ formData }) => (
   <Document>
     <Page size="A4" style={styles.page}>
       <View style={styles.section}>
-        <Image style={styles.image} src="/img/projeta.png" />
+        {/* Usar uma URL válida para a imagem */}
+        <Image style={styles.image} src="https://example.com/img/projeta.png" />
         <Text style={styles.title}>Relatório Diário de Obras</Text>
         <Text style={styles.header}>Dados da Obra</Text>
         <Text style={styles.text}>
-          Número do Contrato: {formData.numeroContrato}
+          Número do Contrato: {formData.numeroContrato || "N/A"}
         </Text>
-        <Text style={styles.text}>Nome da Obra: {formData.nomeObra}</Text>
-        <Text style={styles.text}>Cliente: {formData.cliente}</Text>
-        <Text style={styles.text}>Data: {formData.data}</Text>
+        <Text style={styles.text}>
+          Nome da Obra: {formData.nomeObra || "N/A"}
+        </Text>
+        <Text style={styles.text}>Cliente: {formData.cliente || "N/A"}</Text>
+        <Text style={styles.text}>Data: {formData.data || "N/A"}</Text>
       </View>
+
       <View style={styles.section}>
         <Text style={styles.header}>Detalhes do Trabalho</Text>
         <Text style={styles.text}>
-          Horas Trabalhadas: {formData.horasTrabalhadas}
-        </Text>
-        <Text style={styles.text}>Tempo pela Manhã: {formData.tempoManha}</Text>
-        <Text style={styles.text}>Tempo pela Tarde: {formData.tempoTarde}</Text>
-        <Text style={styles.text}>
-          Observações da Fiscalização: {formData.observacoesFiscalizacao}
+          Horas Trabalhadas: {formData.horasTrabalhadas || "N/A"}
         </Text>
         <Text style={styles.text}>
-          Observações da Contratada: {formData.observacoesContratada}
+          Tempo pela Manhã: {formData.tempoManha || "N/A"}
+        </Text>
+        <Text style={styles.text}>
+          Tempo pela Tarde: {formData.tempoTarde || "N/A"}
+        </Text>
+        <Text style={styles.text}>
+          Observações da Fiscalização:{" "}
+          {formData.observacoesFiscalizacao || "N/A"}
+        </Text>
+        <Text style={styles.text}>
+          Observações da Contratada: {formData.observacoesContratada || "N/A"}
         </Text>
       </View>
+
       <View style={styles.signature}>
         <Text>___________________________________</Text>
         <Text>Assinatura</Text>
