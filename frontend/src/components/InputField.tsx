@@ -9,6 +9,7 @@ interface InputFieldProps {
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   type?: string;
   readOnly?: boolean;
+  required?: boolean; // Adicionando required como opcional
   icon: JSX.Element;
 }
 
@@ -19,6 +20,7 @@ const InputField: React.FC<InputFieldProps> = ({
   onChange,
   type = "text",
   readOnly = false,
+  required = false, // Valor padrão definido para false
   icon,
 }) => (
   <div className="mb-4">
@@ -34,6 +36,7 @@ const InputField: React.FC<InputFieldProps> = ({
       value={value}
       onChange={onChange}
       readOnly={readOnly}
+      required={required} // Passando a propriedade required ao Input
     />
   </div>
 );
