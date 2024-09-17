@@ -1,6 +1,6 @@
 // components/SelectField.tsx
 import React from "react";
-import { Label } from "@/components/ui/Label";
+import { Label } from "@/components/ui/label";
 
 interface Option {
   label: string;

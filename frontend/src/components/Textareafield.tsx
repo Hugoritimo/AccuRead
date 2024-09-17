@@ -18,7 +18,7 @@ const TextareaField: React.FC<TextareaFieldProps> = ({
   icon,
 }) => (
   <div className="mb-4">
-    <Label className="block text-sm font-medium mb-2 text-gray-700 flex items-center">
+    <Label className="block text-sm font-medium mb-2 text-gray-700 items-center">
       {icon}
       <span className="ml-2">{label}</span>
     </Label>
