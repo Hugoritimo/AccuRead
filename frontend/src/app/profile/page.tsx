@@ -28,7 +28,7 @@ const ProfilePage = () => {
       <header className="w-full max-w-2xl flex justify-between items-center mb-8">
         <h1 className="text-3xl font-extrabold text-333333">Perfil</h1>
         <Button
-          variant="primary"
+          variant="default"
           onClick={handleSave}
           className="bg-af1b1b text-white hover:bg-#cc1515"
         >
