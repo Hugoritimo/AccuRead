@@ -12,13 +12,15 @@ import Image from "next/image";
 
 const RegisterPage: React.FC = () => {
   const [fullName, setFullName] = useState<string>("");
+  const [email, setEmail] = useState<string>(""); // Estado para o e-mail
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (fullName === "") {
-      toast.error("Por favor, preencha o nome completo.");
+    if (!fullName || !email) {
+      // Verificação de ambos campos
+      toast.error("Por favor, preencha todos os campos.");
       return;
     }
 
@@ -38,7 +40,7 @@ const RegisterPage: React.FC = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ username }),
+        body: JSON.stringify({ username, email }), // Incluindo email na requisição
       });
 
       if (response.ok) {
@@ -91,6 +93,26 @@ const RegisterPage: React.FC = () => {
                 aria-required="true"
               />
             </div>
+
+            <div className="mb-6">
+              <Label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                E-mail
+              </Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="Digite seu e-mail"
+                className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                aria-required="true"
+              />
+            </div>
+
             <Button
               type="submit"
               className="w-full bg-[#af1b1b] hover:bg-red-700 text-white font-semibold py-3 px-4 rounded-xl shadow-lg transition duration-300"
