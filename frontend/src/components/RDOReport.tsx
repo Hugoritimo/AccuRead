@@ -8,6 +8,38 @@ import {
   Image,
 } from "@react-pdf/renderer";
 
+interface FormData {
+  numeroContrato: string;
+  nomeObra: string;
+  cliente: string;
+  data: string;
+  atividadesDiarias: string;
+  observacoesFiscalizacao: string;
+  observacoesContratada: string;
+  qtdEfetivo: string;
+  qtdEquipamentos: string;
+  qtdFerramentas: string;
+  condicoesMeteorologicas: string;
+  regimeTrabalho: string;
+  gerente: string;
+  responsavel: string;
+  engenheiro: string;
+  especialista: string;
+  consultor: string;
+  projetista: string;
+  cadista: string;
+  encarregado: string;
+  topografo: string;
+  sondador: string;
+  pedreiro: string;
+  tecnicoSeguranca: string;
+  auxiliar: string;
+  eletricista: string;
+  instalador: string;
+  ajudante: string;
+  filePreviews: string[];
+}
+
 interface RDOReportProps {
   formData: FormData;
 }
@@ -15,7 +47,6 @@ interface RDOReportProps {
 const RDOReport: React.FC<RDOReportProps> = ({ formData }) => {
   return (
     <Document>
-      5574032
       <Page style={styles.body}>
         <View style={styles.header}>
           <Image src="/img/projeta.png" style={styles.logo} />
@@ -38,7 +69,9 @@ const RDOReport: React.FC<RDOReportProps> = ({ formData }) => {
           </View>
           <View style={styles.row}>
             <Text style={styles.label}>Data:</Text>
-            <Text style={styles.value}>{formData.data}</Text>
+            <Text style={styles.value}>
+              {new Date(formData.data).toLocaleDateString()}
+            </Text>
           </View>
         </View>
 
@@ -95,8 +128,12 @@ const RDOReport: React.FC<RDOReportProps> = ({ formData }) => {
           <Text style={styles.subtitle}>Fotos</Text>
           <View style={styles.imageGrid}>
             {formData.filePreviews.map((preview, index) => (
-              // eslint-disable-next-line jsx-a11y/alt-text
-              <Image key={index} src={preview} style={styles.image} />
+              <Image
+                key={index}
+                src={preview}
+                style={styles.image}
+                alt={`Imagem ${index + 1}`}
+              />
             ))}
           </View>
         </View>
