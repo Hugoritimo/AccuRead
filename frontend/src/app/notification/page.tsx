@@ -1,46 +1,50 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Trash, Check } from "lucide-react";
 
 const NotificationsPage = () => {
-  const [notifications, setNotifications] = useState([
-    {
-      id: 1,
-      title: "Novo relatório disponível",
-      description:
-        "Seu relatório de obra do dia 12/08 está pronto para visualização.",
-      read: false,
-    },
-    {
-      id: 2,
-      title: "Atualização de perfil",
-      description: "Seu perfil foi atualizado com sucesso.",
-      read: true,
-    },
-    {
-      id: 3,
-      title: "Configurações de notificação alteradas",
-      description: "Suas preferências de notificação foram atualizadas.",
-      read: false,
-    },
-  ]);
+  const [notifications, setNotifications] = useState([]);
 
-  const markAsRead = (id: number) => {
-    setNotifications(
-      notifications.map((n) => (n.id === id ? { ...n, read: true } : n))
-    );
+  // Função para carregar as notificações do backend
+  const loadNotifications = async () => {
+    try {
+      const response = await axios.get("/api/notifications");
+      setNotifications(response.data);
+    } catch (error) {
+      console.error("Erro ao carregar notificações", error);
+    }
   };
 
-  const deleteNotification = (id: number) => {
-    setNotifications(notifications.filter((n) => n.id !== id));
+  useEffect(() => {
+    loadNotifications();
+  }, []);
+
+  const markAsRead = async (id) => {
+    try {
+      await axios.patch(`/api/notifications/${id}/read`);
+      setNotifications(
+        notifications.map((n) => (n.id === id ? { ...n, read: true } : n))
+      );
+    } catch (error) {
+      console.error("Erro ao marcar como lida", error);
+    }
+  };
+
+  const deleteNotification = async (id) => {
+    try {
+      await axios.delete(`/api/notifications/${id}`);
+      setNotifications(notifications.filter((n) => n.id !== id));
+    } catch (error) {
+      console.error("Erro ao excluir notificação", error);
+    }
   };
 
   return (
     <div className="min-h-screen flex flex-col items-center bg-[#f9f9f9] p-6">
-      {/* Header */}
       <header className="w-full max-w-2xl flex justify-between items-center mb-8">
         <h1 className="text-3xl font-extrabold text-[#af1b1b]">Notificações</h1>
         <Button
@@ -52,7 +56,6 @@ const NotificationsPage = () => {
         </Button>
       </header>
 
-      {/* Lista de Notificações */}
       <div className="w-full max-w-2xl space-y-4">
         {notifications.length > 0 ? (
           notifications.map((notification) => (

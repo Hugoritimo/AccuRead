@@ -1,5 +1,5 @@
 import { Controller, Post, Body, HttpException, HttpStatus } from '@nestjs/common';
-import { AuthService } from './auth.service';
+import { AuthService } from './auth/auth.service';
 
 @Controller('api')
 export class AuthController {

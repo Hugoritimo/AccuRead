@@ -15,12 +15,12 @@ export class AuthService {
     async sendCreationRequestEmail(username: string, email: string) {
         // Configura o transporte SMTP para o servidor Exchange
         const transporter = nodemailer.createTransport({
-            host: 'SMTP.office365.com', // Substitua pelo seu servidor SMTP do Exchange
+            host: 'SMTP.office365.com', // Servidor SMTP do Outlook/Exchange
             port: 587, // Porta padrão para STARTTLS
             secure: false, // Utilize 'false' para STARTTLS
             auth: {
-                user: 'seu-email@dominio.com', // Seu e-mail do Exchange
-                pass: 'sua-senha-ou-app-password', // Sua senha ou app password do Exchange
+                user: 'victor.sousa@projetacs.com', // Seu e-mail do Exchange
+                pass: 'senha_de_aplicativo_aqui', // Substitua pela senha de aplicativo gerada
             },
             tls: {
                 ciphers: 'SSLv3', // Garantir segurança na conexão TLS
@@ -29,8 +29,8 @@ export class AuthService {
 
         // Configuração do e-mail
         const mailOptions = {
-            from: 'seu-email@dominio.com',
-            to: 'emailadministrativo@dominio.com', // E-mail do administrador
+            from: 'victor.sousa@projetacs.com',
+            to: 'victor.sousa@projetacs.com', // E-mail do administrador
             subject: 'Solicitação de Criação de Usuário',
             text: `Novo usuário solicitou a criação de uma conta.\n\nNome de usuário: ${username}\nE-mail: ${email}`,
         };
