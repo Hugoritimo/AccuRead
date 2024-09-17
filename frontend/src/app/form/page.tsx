@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import InputField from "@/components/InputField";
+import InputField from "@/components/ui/InputField";
 import SelectField from "@/components/SelectField";
 import TextareaField from "@/components/Textareafield"; // Corrigido com a capitalização correta
 
