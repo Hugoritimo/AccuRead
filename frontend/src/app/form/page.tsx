@@ -17,10 +17,52 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import InputField from "@/components/InputField";
 import SelectField from "@/components/SelectField";
-import TextareaField from "@/components/Textareafield";
+import TextareaField from "@/components/TextareaField"; // Corrigido com a capitalização correta
+
+// Tipos do estado e da ação
+interface FormState {
+  numeroRDO: string;
+  gerencia: string;
+  objeto: string;
+  data: Date | null;
+  contrato: string;
+  obra: string;
+  contratante: string;
+  responsavel: string;
+  dataInicioObra: Date | null;
+  dataTerminoObra: Date | null;
+  horasTrabalhadas: string;
+  tempoManha: string;
+  tempoTarde: string;
+  disciplina: string;
+  localObra: string;
+  qtdEfetivo: string;
+  qtdEquipamentos: string;
+  horarioChegadaEquipe: string;
+  horarioDDS: string;
+  chegadaFiscal: string;
+  nomeFiscal: string;
+  liberacaoFrenteServico: string;
+  inicioAtividades: string;
+  almocoSaida: string;
+  almocoRetorno: string;
+  finalizacaoAtividades: string;
+  saidaCanteiro: string;
+  atividadesDiarias: string;
+  observacoesFiscalizacao: string;
+  observacoesContratada: string;
+  anexos: File[];
+}
+
+interface FormAction {
+  type: "SET_FIELD" | "ADD_ANEXOS" | "RESET";
+  field?: string;
+  value?: any;
+  files?: File[];
+}
 
 // Estado inicial do formulário
-const initialState = {
+const initialState: FormState = {
   numeroRDO: "",
   gerencia: "",
   objeto: "",
@@ -55,14 +97,14 @@ const initialState = {
 };
 
 // Função redutora para gerenciamento do estado do formulário
-const formReducer = (state, action) => {
+const formReducer = (state: FormState, action: FormAction): FormState => {
   switch (action.type) {
     case "SET_FIELD":
-      return { ...state, [action.field]: action.value };
+      return { ...state, [action.field!]: action.value };
     case "ADD_ANEXOS":
       return {
         ...state,
-        anexos: [...state.anexos, ...action.files],
+        anexos: [...state.anexos, ...(action.files || [])],
       };
     case "RESET":
       return initialState;
