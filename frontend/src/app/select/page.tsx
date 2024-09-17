@@ -4,12 +4,21 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { FaIndustry, FaBuilding } from "react-icons/fa";
-import { FaChessPawn } from "react-icons/fa";
+import { FaIndustry, FaBuilding, FaChessPawn } from "react-icons/fa"; // Importando todos os ícones de uma vez
+import { IconType } from "react-icons"; // Importando o tipo correto para os ícones
 
-const SelectionButton = ({
+interface SelectionButtonProps {
+  company: string;
+  icon: IconType; // Usando o tipo IconType para o ícone
+  label: string;
+  gradientFrom: string;
+  gradientTo: string;
+  onSelect: (company: string) => void;
+}
+
+const SelectionButton: React.FC<SelectionButtonProps> = ({
   company,
-  icon: Icon,
+  icon: Icon, // Usando IconType
   label,
   gradientFrom,
   gradientTo,
@@ -61,7 +70,7 @@ const SelectPage = () => {
             <div className="grid grid-cols-1 gap-6">
               <SelectionButton
                 company="vale"
-                icon={FaIndustry}
+                icon={FaIndustry} // Passando o ícone correto
                 label="Vale"
                 gradientFrom="#af1b1b"
                 gradientTo="#cc1f1f"
@@ -69,7 +78,7 @@ const SelectPage = () => {
               />
               <SelectionButton
                 company="alumar"
-                icon={FaBuilding}
+                icon={FaBuilding} // Passando o ícone correto
                 label="Alumar"
                 gradientFrom="#af1b1b"
                 gradientTo="#cc1f1f"
@@ -77,7 +86,7 @@ const SelectPage = () => {
               />
               <SelectionButton
                 company="projeta"
-                icon={FaChessPawn} // Alterado para o ícone de pião de xadrez
+                icon={FaChessPawn} // Ícone de pião de xadrez
                 label="Projeta"
                 gradientFrom="#af1b1b"
                 gradientTo="#cc1f1f"
