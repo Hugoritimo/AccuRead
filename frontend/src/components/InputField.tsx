@@ -10,7 +10,7 @@ interface InputFieldProps {
   type?: string;
   readOnly?: boolean;
   required?: boolean; // Adicionando required como opcional
-  icon: JSX.Element;
+  icon?: JSX.Element; // Tornando icon opcional
 }
 
 const InputField: React.FC<InputFieldProps> = ({
@@ -25,8 +25,9 @@ const InputField: React.FC<InputFieldProps> = ({
 }) => (
   <div className="mb-4">
     <Label className="block text-sm font-medium mb-2 text-gray-700 flex items-center">
-      {icon}
-      <span className="ml-2">{label}</span>
+      {icon && <span className="mr-2">{icon}</span>}{" "}
+      {/* Renderizar o ícone se ele for passado */}
+      <span>{label}</span>
     </Label>
     <Input
       type={type}
