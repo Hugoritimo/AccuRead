@@ -4,38 +4,50 @@ import * as nodemailer from 'nodemailer';
 
 @Injectable()
 export class AuthService {
-    // O serviço lida com a solicitação de criação de usuário e envio de e-mail
-    async requestUserCreation(username: string, email: string): Promise<{ success: boolean; message?: string }> {
-        // Envia um e-mail para o administrador com os dados do usuário
-        await this.sendCreationRequestEmail(username, email);
+    // Array de usuários hardcoded (sem banco de dados)
+    private readonly users = [
+        { id: 1, username: 'victor.sousa', password: '!Projeta4359', role: 'admin' },
+        { id: 2, username: 'befranio.junior', password: '!Projeta4359', role: 'user' },
+        { id: 3, username: 'lucas.costa', password: '!Projeta4359', role: 'guest' },
+    ];
 
+    // Função que valida o nome de usuário e a senha
+    async validateUser(username: string, password: string): Promise<any> {
+        const user = this.users.find(
+            (u) => u.username === username && u.password === password,
+        );
+        if (user) {
+            const { password, ...result } = user;
+            return result;
+        }
+        return null;
+    }
+
+    // Função para solicitar a criação de um novo usuário e enviar o e-mail
+    async requestUserCreation(username: string, email: string): Promise<{ success: boolean; message: string }> {
+        await this.sendCreationRequestEmail(username, email);
         return { success: true, message: 'Solicitação enviada com sucesso! Um e-mail foi enviado ao administrador.' };
     }
 
+    // Função para enviar o e-mail de solicitação de criação de usuário
     async sendCreationRequestEmail(username: string, email: string) {
-        // Configura o transporte SMTP para o servidor Exchange
         const transporter = nodemailer.createTransport({
-            host: 'SMTP.office365.com', // Servidor SMTP do Outlook/Exchange
-            port: 587, // Porta padrão para STARTTLS
-            secure: false, // Utilize 'false' para STARTTLS
+            host: 'SMTP.office365.com',
+            port: 587,
+            secure: false,
             auth: {
-                user: 'victor.sousa@projetacs.com', // Seu e-mail do Exchange
-                pass: 'senha_de_aplicativo_aqui', // Substitua pela senha de aplicativo gerada
-            },
-            tls: {
-                ciphers: 'SSLv3', // Garantir segurança na conexão TLS
+                user: 'seu-email@dominio.com',
+                pass: 'sua-senha-de-aplicativo',
             },
         });
 
-        // Configuração do e-mail
         const mailOptions = {
-            from: 'victor.sousa@projetacs.com',
-            to: 'victor.sousa@projetacs.com', // E-mail do administrador
+            from: 'seu-email@dominio.com',
+            to: 'admin@dominio.com', // E-mail do administrador
             subject: 'Solicitação de Criação de Usuário',
             text: `Novo usuário solicitou a criação de uma conta.\n\nNome de usuário: ${username}\nE-mail: ${email}`,
         };
 
-        // Enviar o e-mail
         return transporter.sendMail(mailOptions);
     }
 }

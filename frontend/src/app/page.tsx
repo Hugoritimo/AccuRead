@@ -23,27 +23,32 @@ export default function LoginPage() {
     e.preventDefault();
     setIsLoading(true);
 
+    // Validação simples para garantir que os campos estão preenchidos
+    if (!username || !password) {
+      toast.error("Por favor, preencha todos os campos.");
+      setIsLoading(false);
+      return;
+    }
+
     try {
-      const response = await fetch("http://localhost:3001/api/authenticate", {
+      const response = await fetch("http://localhost:3001/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ username, password, rememberMe }),
+        body: JSON.stringify({ username, password }),
       });
 
       if (response.ok) {
         const result = await response.json();
-        if (result.success) {
-          toast.success("Login bem-sucedido!");
-          setTimeout(() => {
-            router.push("/home"); // Redireciona para a página principal
-          }, 1000); // Atraso para exibir a notificação de sucesso
-        } else {
-          toast.error(result.message || "Nome de usuário ou senha incorretos");
-        }
+        toast.success("Login bem-sucedido!");
+
+        setTimeout(() => {
+          router.push("/home"); // Redireciona para a página principal após login bem-sucedido
+        }, 1000);
       } else {
-        toast.error("Erro ao tentar fazer login, tente novamente.");
+        const result = await response.json();
+        toast.error(result.message || "Nome de usuário ou senha incorretos");
       }
     } catch (error) {
       console.error(error);
@@ -88,7 +93,7 @@ export default function LoginPage() {
                   htmlFor="username"
                   className="block text-sm font-medium text-brand-dark dark:text-brand-white mb-1"
                 >
-                  Nome de Usuário <br></br>
+                  Nome de Usuário
                 </Label>
                 <Input
                   id="username"
@@ -141,7 +146,13 @@ export default function LoginPage() {
                   className="w-full bg-brand-primary hover:bg-brand-secondary text-white font-semibold py-3 px-4 rounded-xl shadow-lg transition duration-300 dark:bg-brand-primary dark:hover:bg-brand-secondary"
                   disabled={isLoading}
                 >
-                  {isLoading ? "Carregando..." : "Entrar"}
+                  {isLoading ? (
+                    <span className="flex items-center justify-center">
+                      <span className="loader mr-2" /> Carregando...
+                    </span>
+                  ) : (
+                    "Entrar"
+                  )}
                 </Button>
               </motion.div>
             </form>
