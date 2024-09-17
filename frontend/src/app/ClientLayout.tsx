@@ -32,7 +32,7 @@ export default function ClientLayout({
     "/select",
     "/notification",
     "/form",
-  ].includes(pathname);
+  ].includes(pathname ?? ""); // Garante que pathname nunca será null
 
   return (
     <>
