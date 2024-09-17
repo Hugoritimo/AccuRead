@@ -1,4 +1,3 @@
-"use client";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,8 +5,15 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Trash, Check } from "lucide-react";
 
+interface Notification {
+  id: string;
+  title: string;
+  description: string;
+  read: boolean;
+}
+
 const NotificationsPage = () => {
-  const [notifications, setNotifications] = useState([]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
 
   // Função para carregar as notificações do backend
   const loadNotifications = async () => {
@@ -23,8 +29,7 @@ const NotificationsPage = () => {
     loadNotifications();
   }, []);
 
-  // Define o tipo de 'id' como string ou number
-  const markAsRead = async (id: string | number) => {
+  const markAsRead = async (id: string) => {
     try {
       await axios.patch(`/api/notifications/${id}/read`);
       setNotifications(
@@ -35,8 +40,7 @@ const NotificationsPage = () => {
     }
   };
 
-  // Define o tipo de 'id' como string ou number
-  const deleteNotification = async (id: string | number) => {
+  const deleteNotification = async (id: string) => {
     try {
       await axios.delete(`/api/notifications/${id}`);
       setNotifications(notifications.filter((n) => n.id !== id));
