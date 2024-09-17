@@ -17,7 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import InputField from "@/components/InputField";
 import SelectField from "@/components/SelectField";
-import TextareaField from "@/components/TextareaField";
+import TextareaField from "@/components/Textareafield";
 
 // Estado inicial do formulário
 const initialState = {
