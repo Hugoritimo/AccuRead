@@ -13,13 +13,22 @@ const HomePage = () => {
       {/* Header */}
       <header className="w-full max-w-5xl flex justify-between items-center mb-8">
         <h1 className="text-4xl font-extrabold text-[#af1b1b]">AccuRead</h1>
+
+        {/* Perfil Button with Lordicon */}
         <Button
           variant="ghost"
           onClick={() => router.push("/profile")}
-          className="text-[#af1b1b] hover:bg-[#fce4e4] p-2 rounded-md"
+          className="text-[#af1b1b] hover:bg-[#fce4e4] p-2 rounded-md flex items-center"
         >
           <FaUser className="mr-2" />
           Perfil
+          {/* Lordicon */}
+          <lord-icon
+            src="https://cdn.lordicon.com/gkgkfbzm.json"
+            trigger="hover"
+            colors="primary:#ffffff,secondary:#915110"
+            style={{ width: "50px", height: "50px", marginLeft: "10px" }}
+          />
         </Button>
       </header>
 
@@ -59,7 +68,7 @@ const HomePage = () => {
       {/* Footer */}
       <footer className="w-full max-w-5xl mt-12 text-center text-[#666666]">
         <p>
-          &copy; 2024 Projeta. <br></br>
+          &copy; 2024 Projeta. <br />
           Todos os direitos reservados.
         </p>
       </footer>
