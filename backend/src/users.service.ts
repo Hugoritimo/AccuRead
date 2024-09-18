@@ -4,19 +4,16 @@ import { Injectable } from '@nestjs/common';
 @Injectable()
 export class UsersService {
     private users = [
-        { id: 1, username: 'admin', password: 'admin123', email: 'admin@example.com' },
-        { id: 2, username: 'user1', password: 'user123', email: 'user1@example.com' },
+        { id: 1, username: 'victor.sousa', password: '!Projeta4359', role: 'admin' },
+        { id: 2, username: 'befranio.junior', password: '!Projeta4359', role: 'user' },
+        { id: 3, username: 'lucas.costa', password: '!Projeta4359', role: 'guest' },
     ];
 
-    async findUser(username: string) {
+    async findByUsername(username: string) {
         return this.users.find((user) => user.username === username);
     }
 
-    async validateUser(username: string, password: string) {
-        const user = await this.findUser(username);
-        if (user && user.password === password) {
-            return user;
-        }
-        return null;
+    async create(user: any) {
+        this.users.push(user);
     }
 }

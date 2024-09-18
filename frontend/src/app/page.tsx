@@ -33,9 +33,7 @@ export default function LoginPage() {
     try {
       const response = await fetch("http://localhost:3001/auth/login", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
       });
 
@@ -53,9 +51,9 @@ export default function LoginPage() {
     } catch (error) {
       console.error(error);
       toast.error("Erro ao tentar fazer login, tente novamente.");
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   return (

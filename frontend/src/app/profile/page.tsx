@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -8,23 +8,66 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useRouter } from "next/navigation";
 
 const ProfilePage = () => {
-  const [name, setName] = useState("victor Hugo");
-  const [email, setEmail] = useState("victor.sousa@projetacs.com");
-  const [password, setPassword] = useState("");
+  const [name, setName] = useState(""); // Estado para armazenar o nome do usuário
+  const [email, setEmail] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("/img/avatar-placeholder.png");
   const router = useRouter();
 
-  const handleSave = () => {
-    alert("Perfil atualizado com sucesso!");
-  };
+  // Função para buscar o perfil do usuário autenticado
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await fetch("http://localhost:3001/auth/profile", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`, // Usando o token de autenticação
+          },
+        });
 
-  const handleAvatarChange = () => {
-    alert("Função de alteração de avatar");
+        if (response.ok) {
+          const data = await response.json();
+          setName(data.name); // Atualizando o nome do usuário
+          setEmail(data.email);
+          setAvatarUrl(data.avatarUrl || "/img/avatar-placeholder.png");
+        } else {
+          console.error("Erro ao buscar perfil");
+        }
+      } catch (error) {
+        console.error("Erro ao buscar perfil:", error);
+      }
+    };
+
+    fetchProfile();
+  }, []);
+
+  // Função para salvar o perfil
+  const handleSave = async () => {
+    try {
+      const response = await fetch(
+        "http://localhost:3001/auth/update-profile",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify({ name, email }),
+        }
+      );
+
+      if (response.ok) {
+        alert("Perfil atualizado com sucesso!");
+      } else {
+        console.error("Erro ao atualizar perfil");
+      }
+    } catch (error) {
+      console.error("Erro ao atualizar perfil:", error);
+    }
   };
 
   return (
     <div className="min-h-screen flex flex-col items-center bg-f9f9f9 p-6">
-      {/* Header */}
       <header className="w-full max-w-2xl flex justify-between items-center mb-8">
         <h1 className="text-3xl font-extrabold text-333333">Perfil</h1>
         <Button
@@ -36,7 +79,6 @@ const ProfilePage = () => {
         </Button>
       </header>
 
-      {/* Informações do Usuário */}
       <Card className="w-full max-w-2xl mb-6 bg-ffffff border border-cccccc">
         <CardHeader>
           <CardTitle className="text-xl font-semibold text-333333">
@@ -45,11 +87,10 @@ const ProfilePage = () => {
         </CardHeader>
         <CardContent>
           <div className="flex items-center space-x-6">
-            {/* Avatar */}
-            <div onClick={handleAvatarChange} className="cursor-pointer">
+            <div className="cursor-pointer">
               <Avatar className="h-24 w-24">
                 <AvatarImage src={avatarUrl} alt="Avatar do usuário" />
-                <AvatarFallback>VH</AvatarFallback>
+                <AvatarFallback>{name[0]}</AvatarFallback>
               </Avatar>
               <p className="text-sm text-333333 text-center mt-2">
                 Alterar Avatar
@@ -68,7 +109,7 @@ const ProfilePage = () => {
                   id="name"
                   type="text"
                   value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  onChange={(e) => setName(e.target.value)} // Atualiza o estado do nome ao editar
                   className="w-full p-3 border border-cccccc rounded-lg"
                 />
               </div>
@@ -83,65 +124,12 @@ const ProfilePage = () => {
                   id="email"
                   type="email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full p-3 border border-cccccc rounded-lg"
-                />
-              </div>
-              <div>
-                <Label
-                  htmlFor="password"
-                  className="block text-sm font-medium text-333333"
-                >
-                  Senha
-                </Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Deixe em branco para manter a mesma"
+                  onChange={(e) => setEmail(e.target.value)} // Atualiza o estado do email ao editar
                   className="w-full p-3 border border-cccccc rounded-lg"
                 />
               </div>
             </form>
           </div>
-        </CardContent>
-      </Card>
-
-      {/* Seção de Configurações */}
-      <Card className="w-full max-w-2xl bg-ffffff border border-cccccc">
-        <CardHeader>
-          <CardTitle className="text-xl font-semibold text-333333">
-            Configurações
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ul className="space-y-4">
-            <li>
-              <Button
-                variant="ghost"
-                className="w-full text-left text-af1b1b hover:bg-ffd1d1"
-              >
-                Mudar Senha
-              </Button>
-            </li>
-            <li>
-              <Button
-                variant="ghost"
-                className="w-full text-left text-af1b1b hover:bg-ffd1d1"
-              >
-                Configurações de Notificação
-              </Button>
-            </li>
-            <li>
-              <Button
-                variant="ghost"
-                className="w-full text-left text-af1b1b hover:bg-ffd1d1"
-              >
-                Outras Configurações
-              </Button>
-            </li>
-          </ul>
         </CardContent>
       </Card>
     </div>
