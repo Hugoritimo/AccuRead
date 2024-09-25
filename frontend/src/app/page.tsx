@@ -13,83 +13,93 @@ import Image from "next/image";
 import Link from "next/link";
 
 export default function LoginPage() {
-  const [username, setUsername] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const [rememberMe, setRememberMe] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const router = useRouter();
+  const [username, setUsername] = useState<string>(""); // Estado para o nome de usuário.
+  const [password, setPassword] = useState<string>(""); // Estado para a senha.
+  const [rememberMe, setRememberMe] = useState<boolean>(false); // Estado para lembrar-me.
+  const [isLoading, setIsLoading] = useState<boolean>(false); // Estado para controlar o carregamento do botão.
+  const router = useRouter(); // Hook para navegação entre páginas.
 
+  // Função chamada ao enviar o formulário.
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
+    e.preventDefault(); // Previne o comportamento padrão do formulário.
+    setIsLoading(true); // Ativa o estado de carregamento.
 
-    // Validação simples para garantir que os campos estão preenchidos
+    // Validação para garantir que os campos foram preenchidos.
     if (!username || !password) {
-      toast.error("Por favor, preencha todos os campos.");
-      setIsLoading(false);
+      toast.error("Por favor, preencha todos os campos."); // Exibe erro se os campos estiverem vazios.
+      setIsLoading(false); // Desativa o estado de carregamento.
       return;
     }
 
     try {
+      // Fazendo a chamada para a API de login.
       const response = await fetch("http://localhost:3001/auth/login", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
+        headers: { "Content-Type": "application/json" }, // Define o cabeçalho como JSON.
+        body: JSON.stringify({ username, password }), // Envia os dados de login no corpo da requisição.
       });
 
+      // Verifica se o login foi bem-sucedido.
       if (response.ok) {
-        const result = await response.json();
-        toast.success("Login bem-sucedido!");
+        const result = await response.json(); // Obtém a resposta.
+        toast.success("Login bem-sucedido!"); // Exibe mensagem de sucesso.
 
+        // Redireciona para a página inicial após o login bem-sucedido.
         setTimeout(() => {
-          router.push("/home"); // Redireciona para a página principal após login bem-sucedido
+          router.push("/home");
         }, 1000);
       } else {
-        const result = await response.json();
-        toast.error(result.message || "Nome de usuário ou senha incorretos");
+        const result = await response.json(); // Obtém a resposta de erro.
+        toast.error(result.message || "Nome de usuário ou senha incorretos"); // Exibe a mensagem de erro.
       }
     } catch (error) {
-      console.error(error);
-      toast.error("Erro ao tentar fazer login, tente novamente.");
+      console.error(error); // Exibe o erro no console.
+      toast.error("Erro ao tentar fazer login, tente novamente."); // Exibe um erro genérico ao tentar fazer login.
     } finally {
-      setIsLoading(false);
+      setIsLoading(false); // Desativa o estado de carregamento.
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-gray-100 via-gray-200 to-gray-300 dark:bg-gradient-to-r dark:from-gray-800 dark:via-gray-900 dark:to-gray-800 p-4">
-      <ToastContainer />
+      {/* Container principal com fundo gradiente claro e escuro */}
+      <ToastContainer /> {/* Componente de notificações */}
       <motion.div
         variants={{
-          hidden: { opacity: 0, y: 50 },
-          visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+          hidden: { opacity: 0, y: 50 }, // Animação inicial (escondido).
+          visible: { opacity: 1, y: 0, transition: { duration: 0.5 } }, // Animação visível.
         }}
         initial="hidden"
         animate="visible"
         className="w-full max-w-md p-8 shadow-2xl bg-white dark:bg-gray-900 rounded-3xl border border-brand-primary"
       >
+        {/* Div para o card de login com animação do Framer Motion */}
         <Card>
           <CardHeader className="flex flex-col items-center mb-6">
+            {/* Cabeçalho do card */}
             <Image
-              src="/img/projeta.png"
-              alt="Logo"
-              width={100}
-              height={100}
-              className="mb-4"
+              src="/img/projeta.png" // Caminho da imagem (logo).
+              alt="Logo" // Texto alternativo da imagem.
+              width={100} // Largura da imagem.
+              height={100} // Altura da imagem.
+              className="mb-4" // Classe para margens.
             />
-            <CardTitle className="text-center text-4xl font-extrabold text-brand-dark dark:text-brand-white">
+            <CardTitle className="text-center text-4xl font-extrabold text-brand-dark dark:text-white">
+              {/* Título do card */}
               AccuRead RDO
             </CardTitle>
-            <p className="text-center text-brand-gray dark:text-brand-white mt-2">
+            <p className="text-center text-gray-600 dark:text-gray-300 mt-2">
+              {/* Descrição abaixo do título */}
               Faça login para continuar
             </p>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Formulário de login */}
               <div>
                 <Label
                   htmlFor="username"
-                  className="block text-sm font-medium text-brand-dark dark:text-brand-white mb-1"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1"
                 >
                   Nome de Usuário
                 </Label>
@@ -97,16 +107,16 @@ export default function LoginPage() {
                   id="username"
                   type="text"
                   placeholder="Digite seu nome de usuário"
-                  className="w-full p-3 border border-brand-gray dark:border-gray-600 rounded-lg shadow-sm focus:ring-brand-primary focus:border-brand-primary dark:bg-gray-700 dark:text-brand-white"
+                  className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white"
                   value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  onChange={(e) => setUsername(e.target.value)} // Atualiza o estado com o valor do input.
                   required
                 />
               </div>
               <div>
                 <Label
                   htmlFor="password"
-                  className="block text-sm font-medium text-brand-dark dark:text-brand-white mb-1"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1"
                 >
                   Senha
                 </Label>
@@ -114,19 +124,20 @@ export default function LoginPage() {
                   id="password"
                   type="password"
                   placeholder="Digite sua senha"
-                  className="w-full p-3 border border-brand-gray dark:border-gray-600 rounded-lg shadow-sm focus:ring-brand-primary focus:border-brand-primary dark:bg-gray-700 dark:text-brand-white"
+                  className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => setPassword(e.target.value)} // Atualiza o estado com o valor da senha.
                   required
                 />
               </div>
               <div className="flex items-center">
+                {/* Checkbox para "Lembrar-me" */}
                 <input
                   id="rememberMe"
                   type="checkbox"
-                  className="h-4 w-4 text-brand-primary focus:ring-brand-secondary border-gray-300 rounded"
-                  checked={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                  checked={rememberMe} // Estado do checkbox.
+                  onChange={(e) => setRememberMe(e.target.checked)} // Atualiza o estado com o valor do checkbox.
                 />
                 <Label
                   htmlFor="rememberMe"
@@ -136,15 +147,16 @@ export default function LoginPage() {
                 </Label>
               </div>
               <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                whileHover={{ scale: 1.05 }} // Animação ao passar o mouse.
+                whileTap={{ scale: 0.95 }} // Animação ao clicar.
               >
                 <Button
                   type="submit"
-                  className="w-full bg-brand-primary hover:bg-brand-secondary text-white font-semibold py-3 px-4 rounded-xl shadow-lg transition duration-300 dark:bg-brand-primary dark:hover:bg-brand-secondary"
-                  disabled={isLoading}
+                  className="w-full bg-brand-primary hover:bg-brand-secondary text-white font-semibold py-3 px-4 rounded-xl shadow-lg transition duration-300"
+                  disabled={isLoading} // Desabilita o botão enquanto está carregando.
                 >
                   {isLoading ? (
+                    // Mostra o indicador de carregamento enquanto o login está em progresso.
                     <span className="flex items-center justify-center">
                       <span className="loader mr-2" /> Carregando...
                     </span>
@@ -155,14 +167,16 @@ export default function LoginPage() {
               </motion.div>
             </form>
             <div className="mt-6 text-center">
+              {/* Link para registro */}
               <Link href="/register">
-                <span className="text-sm text-brand-gray hover:text-brand-dark dark:text-gray-400 dark:hover:text-brand-white cursor-pointer">
+                <span className="text-sm text-gray-600 hover:text-gray-800 dark:text-gray-300 dark:hover:text-gray-200 cursor-pointer">
                   Não tem uma conta? Solicite uma
                 </span>
               </Link>
               <br />
+              {/* Link para recuperação de senha */}
               <Link href="/forgot-password">
-                <span className="text-sm text-brand-gray hover:text-brand-dark dark:text-gray-400 dark:hover:text-brand-white cursor-pointer">
+                <span className="text-sm text-gray-600 hover:text-gray-800 dark:text-gray-300 dark:hover:text-gray-200 cursor-pointer">
                   Esqueceu sua senha?
                 </span>
               </Link>

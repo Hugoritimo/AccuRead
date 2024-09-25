@@ -3,86 +3,55 @@
 import React, { useReducer, useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
-// Componentes UI
-import { TooltipProvider } from "@radix-ui/react-tooltip";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import InputField from "@/components/ui/InputField";
-import TextareaField from "@/components/Textareafield";
-
-// Tipos do estado e da ação
-interface FormState {
-  numeroRDO: string;
-  gerencia: string;
-  objeto: string;
-  data: Date | null;
-  contrato: string;
-  obra: string;
-  contratante: string;
-  responsavel: string;
-  dataInicioObra: Date | null;
-  dataTerminoObra: Date | null;
-  horasTrabalhadas: string;
-  tempoManha: string;
-  tempoTarde: string;
-  disciplina: string;
-  localObra: string;
-  qtdEfetivo: string;
-  qtdEquipamentos: string;
-  atividadesDiarias: string;
-  observacoesFiscalizacao: string;
-  observacoesContratada: string;
-  anexos: File[];
-}
-
-interface FormAction {
-  type: "SET_FIELD" | "ADD_ANEXOS" | "RESET";
-  field?: string;
-  value?: any;
-  files?: File[];
-}
+// Função para adicionar o progresso visual
+const ProgressBar: React.FC<{ progress: number }> = ({ progress }) => (
+  <div className="w-full bg-gray-200 rounded-full h-6 mb-4">
+    <div
+      className="bg-[#af1b1b] h-6 rounded-full text-center text-white"
+      style={{ width: `${progress}%` }}
+    >
+      {progress}%
+    </div>
+  </div>
+);
 
 // Estado inicial do formulário
-const initialState: FormState = {
+const initialState = {
   numeroRDO: "",
+  dataRelatorio: null,
+  empresa: "",
+  cliente: "",
+  localObra: "",
   gerencia: "",
-  objeto: "",
-  data: null,
-  contrato: "",
-  obra: "",
-  contratante: "",
-  responsavel: "",
-  dataInicioObra: null,
-  dataTerminoObra: null,
-  horasTrabalhadas: "",
+  responsavelObra: "",
   tempoManha: "",
   tempoTarde: "",
-  disciplina: "",
-  localObra: "",
-  qtdEfetivo: "",
-  qtdEquipamentos: "",
-  atividadesDiarias: "",
+  temperaturaManha: "",
+  temperaturaTarde: "",
+  umidadeManha: "",
+  umidadeTarde: "",
+  efetivo: [{ nome: "", cargo: "", horasTrabalhadas: "" }],
+  equipamentos: [{ nome: "", quantidade: "", condicao: "" }],
+  atividades: "",
+  incidentes: "",
+  checklistSeguranca: [false, false, false, false],
+  fotosProgresso: [],
   observacoesFiscalizacao: "",
   observacoesContratada: "",
-  anexos: [],
+  assinaturas: "",
 };
 
-// Função redutora para gerenciamento do estado do formulário
-const formReducer = (state: FormState, action: FormAction): FormState => {
+const formReducer = (state, action) => {
   switch (action.type) {
     case "SET_FIELD":
-      return { ...state, [action.field!]: action.value };
-    case "ADD_ANEXOS":
+      return { ...state, [action.field]: action.value };
+    case "ADD_ITEM":
       return {
         ...state,
-        anexos: [...state.anexos, ...(action.files || [])],
+        [action.field]: [...state[action.field], action.item],
       };
     case "RESET":
       return initialState;
@@ -91,85 +60,99 @@ const formReducer = (state: FormState, action: FormAction): FormState => {
   }
 };
 
-const FormPage: React.FC = () => {
+const RelatorioDiarioObras = () => {
   const router = useRouter();
   const [state, dispatch] = useReducer(formReducer, initialState);
+  const [progress, setProgress] = useState(0);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  const handleChange = (e) => {
     const { name, value } = e.target;
     dispatch({ type: "SET_FIELD", field: name, value });
+    calculateProgress();
   };
 
-  const handleDateChange = (date: Date | null, name: string) => {
+  const handleDateChange = (date, name) => {
     dispatch({ type: "SET_FIELD", field: name, value: date });
+    calculateProgress();
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleAddItem = (field, item) => {
+    dispatch({ type: "ADD_ITEM", field, item });
+  };
+
+  const handleFileUpload = (e) => {
+    const files = Array.from(e.target.files || []);
+    handleAddItem("fotosProgresso", files);
+  };
+
+  const calculateProgress = () => {
+    const filledFields = Object.values(state).filter(
+      (value) => value !== "" && value !== null
+    );
+    const totalFields = Object.keys(state).length;
+    setProgress((filledFields.length / totalFields) * 100);
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const pdfBlob = await generatePDF();
       const pdfDownloadUrl = URL.createObjectURL(pdfBlob);
       setPdfUrl(pdfDownloadUrl);
-      toast.success("PDF gerado com sucesso!");
+      alert("PDF gerado com sucesso!");
       dispatch({ type: "RESET" });
     } catch (error) {
       console.error(error);
-      toast.error("Erro ao gerar PDF, tente novamente.");
+      alert("Erro ao gerar PDF.");
     }
   };
 
   const generatePDF = async () => {
     const htmlContent = `
       <html>
-        <head>
-          <style>
-            body { font-family: Arial, sans-serif; font-size: 12px; }
-            h1 { font-size: 18px; text-align: center; }
-            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-            th { background-color: #f2f2f2; }
-          </style>
-        </head>
         <body>
           <h1>Relatório Diário de Obras</h1>
-          <table>
-            <tr><th>Número do RDO</th><td>${state.numeroRDO}</td></tr>
-            <tr><th>Gerência</th><td>${state.gerencia}</td></tr>
-            <tr><th>Objeto</th><td>${state.objeto}</td></tr>
-            <tr><th>Data</th><td>${
-              state.data ? state.data.toLocaleDateString() : "N/A"
-            }</td></tr>
-            <tr><th>Contrato</th><td>${state.contrato}</td></tr>
-            <tr><th>Obra</th><td>${state.obra}</td></tr>
-            <tr><th>Contratante</th><td>${state.contratante}</td></tr>
-            <tr><th>Responsável</th><td>${state.responsavel}</td></tr>
-            <tr><th>Data de Início da Obra</th><td>${
-              state.dataInicioObra
-                ? state.dataInicioObra.toLocaleDateString()
-                : "N/A"
-            }</td></tr>
-            <tr><th>Data de Término da Obra</th><td>${
-              state.dataTerminoObra
-                ? state.dataTerminoObra.toLocaleDateString()
-                : "N/A"
-            }</td></tr>
-            <tr><th>Horas Trabalhadas</th><td>${
-              state.horasTrabalhadas
-            }</td></tr>
-            <tr><th>Disciplina</th><td>${state.disciplina}</td></tr>
-            <tr><th>Atividades Diárias</th><td>${
-              state.atividadesDiarias
-            }</td></tr>
-            <tr><th>Observações da Fiscalização</th><td>${
-              state.observacoesFiscalizacao
-            }</td></tr>
-            <tr><th>Observações da Contratada</th><td>${
-              state.observacoesContratada
-            }</td></tr>
-          </table>
+          <p>Número RDO: ${state.numeroRDO}</p>
+          <p>Data: ${state.dataRelatorio}</p>
+          <p>Empresa: ${state.empresa}</p>
+          <p>Cliente: ${state.cliente}</p>
+          <p>Local da Obra: ${state.localObra}</p>
+          <p>Gerência: ${state.gerencia}</p>
+          <p>Responsável: ${state.responsavelObra}</p>
+          <h3>Condições Climáticas</h3>
+          <p>Manhã: ${state.tempoManha}, ${
+      state.temperaturaManha
+    }°C, Umidade: ${state.umidadeManha}%</p>
+          <p>Tarde: ${state.tempoTarde}, ${
+      state.temperaturaTarde
+    }°C, Umidade: ${state.umidadeTarde}%</p>
+          <h3>Efetivo</h3>
+          <ul>${state.efetivo
+            .map(
+              (ef) =>
+                `<li>${ef.nome}, Cargo: ${ef.cargo}, Horas Trabalhadas: ${ef.horasTrabalhadas}</li>`
+            )
+            .join("")}</ul>
+          <h3>Equipamentos</h3>
+          <ul>${state.equipamentos
+            .map(
+              (equip) =>
+                `<li>${equip.nome}, Quantidade: ${equip.quantidade}, Condição: ${equip.condicao}</li>`
+            )
+            .join("")}</ul>
+          <h3>Atividades</h3>
+          <p>${state.atividades}</p>
+          <h3>Incidentes</h3>
+          <p>${state.incidentes}</p>
+          <h3>Checklist de Segurança</h3>
+          <p>${state.checklistSeguranca.join(", ")}</p>
+          <h3>Observações da Fiscalização</h3>
+          <p>${state.observacoesFiscalizacao}</p>
+          <h3>Observações da Contratada</h3>
+          <p>${state.observacoesContratada}</p>
+          <h3>Assinaturas</h3>
+          <p>${state.assinaturas}</p>
         </body>
       </html>
     `;
@@ -184,166 +167,229 @@ const FormPage: React.FC = () => {
   };
 
   return (
-    <TooltipProvider>
-      <div className="container mx-auto p-4">
-        <ToastContainer />
-        <Card className="p-6 shadow-lg border border-gray-300 rounded-lg max-w-4xl mx-auto">
-          <CardHeader>
-            <div className="flex flex-col items-center mb-4">
-              <CardTitle className="text-3xl font-bold text-gray-800">
-                Relatório Diário de Obras
-              </CardTitle>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit}>
-              <SectionTitle title="Informações Iniciais" />
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <InputField
-                  label="Número do RDO"
-                  name="numeroRDO"
-                  value={state.numeroRDO}
-                  onChange={handleChange}
-                  required
-                />
-                <InputField
-                  label="Gerência"
-                  name="gerencia"
-                  value={state.gerencia}
-                  onChange={handleChange}
-                  required
-                />
-                <InputField
-                  label="Objeto"
-                  name="objeto"
-                  value={state.objeto}
-                  onChange={handleChange}
-                  required
-                />
-                <DatePickerField
-                  label="Data"
-                  selected={state.data}
-                  onChange={(date) => handleDateChange(date, "data")}
-                  required
-                />
-                <InputField
-                  label="Contrato"
-                  name="contrato"
-                  value={state.contrato}
-                  onChange={handleChange}
-                  required
-                />
-                <InputField
-                  label="Obra"
-                  name="obra"
-                  value={state.obra}
-                  onChange={handleChange}
-                  required
-                />
-                <InputField
-                  label="Contratante"
-                  name="contratante"
-                  value={state.contratante}
-                  onChange={handleChange}
-                  required
-                />
-                <InputField
-                  label="Responsável"
-                  name="responsavel"
-                  value={state.responsavel}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
+    <div className="container mx-auto p-4 bg-gray-100">
+      <form onSubmit={handleSubmit}>
+        <h1 className="text-2xl font-bold mb-4">Relatório Diário de Obras</h1>
 
-              <SectionTitle title="Efetivo e Equipamentos" />
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <InputField
-                  label="Quantidade de Efetivo"
-                  name="qtdEfetivo"
-                  value={state.qtdEfetivo}
-                  onChange={handleChange}
-                  required
-                />
-                <InputField
-                  label="Quantidade de Equipamentos"
-                  name="qtdEquipamentos"
-                  value={state.qtdEquipamentos}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
+        {/* Progresso */}
+        <ProgressBar progress={progress} />
 
-              <SectionTitle title="Atividades Diárias e Observações" />
-              <TextareaField
-                label="Atividades Diárias"
-                name="atividadesDiarias"
-                value={state.atividadesDiarias}
-                onChange={handleChange}
-                required
-              />
-              <TextareaField
-                label="Observações da Fiscalização"
-                name="observacoesFiscalizacao"
-                value={state.observacoesFiscalizacao}
-                onChange={handleChange}
-                required
-              />
-              <TextareaField
-                label="Observações da Contratada"
-                name="observacoesContratada"
-                value={state.observacoesContratada}
-                onChange={handleChange}
-                required
-              />
+        {/* Dados Gerais */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <InputField
+            label="Número do RDO"
+            name="numeroRDO"
+            value={state.numeroRDO}
+            onChange={handleChange}
+            required
+          />
+          <DatePickerField
+            label="Data"
+            selected={state.dataRelatorio}
+            onChange={(date) => handleDateChange(date, "dataRelatorio")}
+            required
+          />
+          <InputField
+            label="Empresa"
+            name="empresa"
+            value={state.empresa}
+            onChange={handleChange}
+            required
+          />
+          <InputField
+            label="Cliente"
+            name="cliente"
+            value={state.cliente}
+            onChange={handleChange}
+            required
+          />
+          <InputField
+            label="Local da Obra"
+            name="localObra"
+            value={state.localObra}
+            onChange={handleChange}
+            required
+          />
+          <InputField
+            label="Gerência"
+            name="gerencia"
+            value={state.gerencia}
+            onChange={handleChange}
+            required
+          />
+          <InputField
+            label="Responsável pela Obra"
+            name="responsavelObra"
+            value={state.responsavelObra}
+            onChange={handleChange}
+            required
+          />
+        </div>
 
-              <div className="flex flex-col md:flex-row gap-4">
-                <Button
-                  type="submit"
-                  className="bg-blue-600 hover:bg-blue-700 text-white"
-                >
-                  Gerar PDF
-                </Button>
-                {pdfUrl && (
-                  <Button
-                    type="button"
-                    className="bg-green-600 hover:bg-green-700 text-white"
-                    onClick={() => window.open(pdfUrl, "_blank")}
-                  >
-                    Baixar PDF
-                  </Button>
-                )}
-              </div>
-            </form>
-          </CardContent>
-        </Card>
-      </div>
-    </TooltipProvider>
+        {/* Condições Climáticas */}
+        <h3 className="text-lg font-semibold mt-8">Condições Climáticas</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <InputField
+            label="Tempo Manhã"
+            name="tempoManha"
+            value={state.tempoManha}
+            onChange={handleChange}
+          />
+          <InputField
+            label="Tempo Tarde"
+            name="tempoTarde"
+            value={state.tempoTarde}
+            onChange={handleChange}
+          />
+          <InputField
+            label="Temperatura Manhã"
+            name="temperaturaManha"
+            value={state.temperaturaManha}
+            onChange={handleChange}
+          />
+          <InputField
+            label="Temperatura Tarde"
+            name="temperaturaTarde"
+            value={state.temperaturaTarde}
+            onChange={handleChange}
+          />
+          <InputField
+            label="Umidade Manhã"
+            name="umidadeManha"
+            value={state.umidadeManha}
+            onChange={handleChange}
+          />
+          <InputField
+            label="Umidade Tarde"
+            name="umidadeTarde"
+            value={state.umidadeTarde}
+            onChange={handleChange}
+          />
+        </div>
+
+        {/* Efetivo */}
+        <h3 className="text-lg font-semibold mt-8">Efetivo</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <InputField
+            label="Nome do Trabalhador"
+            name="efetivo"
+            value=""
+            onChange={(e) =>
+              handleAddItem("efetivo", {
+                nome: e.target.value,
+                cargo: "",
+                horasTrabalhadas: "",
+              })
+            }
+          />
+        </div>
+
+        {/* Equipamentos */}
+        <h3 className="text-lg font-semibold mt-8">Equipamentos Utilizados</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <InputField
+            label="Nome do Equipamento"
+            name="equipamentos"
+            value=""
+            onChange={(e) =>
+              handleAddItem("equipamentos", {
+                nome: e.target.value,
+                quantidade: "1",
+                condicao: "Bom",
+              })
+            }
+          />
+        </div>
+
+        {/* Atividades do Dia */}
+        <TextareaField
+          label="Atividades Realizadas"
+          name="atividades"
+          value={state.atividades}
+          onChange={handleChange}
+        />
+
+        {/* Incidentes e Segurança */}
+        <TextareaField
+          label="Incidentes ou Problemas"
+          name="incidentes"
+          value={state.incidentes}
+          onChange={handleChange}
+        />
+
+        {/* Observações */}
+        <TextareaField
+          label="Observações da Fiscalização"
+          name="observacoesFiscalizacao"
+          value={state.observacoesFiscalizacao}
+          onChange={handleChange}
+        />
+        <TextareaField
+          label="Observações da Contratada"
+          name="observacoesContratada"
+          value={state.observacoesContratada}
+          onChange={handleChange}
+        />
+
+        {/* Botões */}
+        <div className="flex space-x-4 mt-6">
+          <button
+            type="submit"
+            className="bg-blue-600 text-white py-2 px-4 rounded"
+          >
+            Gerar PDF
+          </button>
+          {pdfUrl && (
+            <a
+              href={pdfUrl}
+              download
+              className="bg-green-600 text-white py-2 px-4 rounded"
+            >
+              Baixar PDF
+            </a>
+          )}
+        </div>
+      </form>
+    </div>
   );
 };
 
 // Componentes Auxiliares
-const SectionTitle: React.FC<{ title: string }> = ({ title }) => (
-  <h2 className="text-xl font-semibold text-gray-800 mt-8 mb-4">{title}</h2>
-);
-
-const DatePickerField: React.FC<{
-  label: string;
-  selected: Date | null;
-  onChange: (date: Date | null) => void;
-  required?: boolean;
-}> = ({ label, selected, onChange, required = false }) => (
-  <div className="flex flex-col">
-    <Label>{label}</Label>
-    <DatePicker
-      selected={selected}
+const InputField = ({ label, name, value, onChange }) => (
+  <div>
+    <label className="block text-sm font-semibold">{label}</label>
+    <input
+      type="text"
+      name={name}
+      value={value}
       onChange={onChange}
-      dateFormat="dd/MM/yyyy"
-      className="mt-2 p-2 border border-gray-300 rounded"
-      placeholderText="Selecione a data"
-      required={required}
+      className="w-full p-2 border border-gray-300 rounded mt-2"
     />
   </div>
 );
 
-export default FormPage;
+const TextareaField = ({ label, name, value, onChange }) => (
+  <div>
+    <label className="block text-sm font-semibold">{label}</label>
+    <textarea
+      name={name}
+      value={value}
+      onChange={onChange}
+      className="w-full p-2 border border-gray-300 rounded mt-2"
+    ></textarea>
+  </div>
+);
+
+const DatePickerField = ({ label, selected, onChange }) => (
+  <div>
+    <label className="block text-sm font-semibold">{label}</label>
+    <DatePicker
+      selected={selected}
+      onChange={onChange}
+      dateFormat="dd/MM/yyyy"
+      className="w-full p-2 border border-gray-300 rounded mt-2"
+    />
+  </div>
+);
+
+export default RelatorioDiarioObras;

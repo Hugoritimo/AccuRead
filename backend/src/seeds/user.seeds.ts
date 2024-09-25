@@ -11,6 +11,7 @@ export class UserSeeds {
             { id: 1, username: 'victor.sousa', password: '!Projeta4359', role: 'admin' },
             { id: 2, username: 'befranio.junior', password: '!Projeta4359', role: 'user' },
             { id: 3, username: 'lucas.costa', password: '!Projeta4359', role: 'guest' },
+            { id: 4, username: 'teste', password: '!Projeta4359', role: 'guest' },
         ];
 
         for (const user of users) {
