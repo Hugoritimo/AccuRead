@@ -23,12 +23,6 @@ const HomePage = () => {
           <FaUser className="mr-2" />
           Perfil
           {/* Lordicon */}
-          <lord-icon
-            src="https://cdn.lordicon.com/gkgkfbzm.json"
-            trigger="hover"
-            colors="primary:#ffffff,secondary:#915110"
-            style={{ width: "50px", height: "50px", marginLeft: "10px" }}
-          />
         </Button>
       </header>
 

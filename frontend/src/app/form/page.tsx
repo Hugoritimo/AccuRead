@@ -1,16 +1,17 @@
 "use client";
 
 import React, { useReducer, useState } from "react";
+("");
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
-// Função para adicionar o progresso visual
+// Barra de Progresso personalizada
 const ProgressBar: React.FC<{ progress: number }> = ({ progress }) => (
-  <div className="w-full bg-gray-200 rounded-full h-6 mb-4">
+  <div className="w-full bg-gray-300 rounded-full h-6 mb-4">
     <div
-      className="bg-[#af1b1b] h-6 rounded-full text-center text-white"
+      className="bg-[#af1b1b] h-6 rounded-full text-center text-white text-sm"
       style={{ width: `${progress}%` }}
     >
       {progress}%
@@ -44,14 +45,22 @@ const initialState = {
   assinaturas: "",
 };
 
-const formReducer = (state, action) => {
+type FormState = typeof initialState;
+
+type FormAction =
+  | { type: "SET_FIELD"; field: keyof FormState; value: any }
+  | { type: "ADD_ITEM"; field: keyof FormState; item: any }
+  | { type: "RESET" };
+
+// Redutor para gerenciamento do estado
+const formReducer = (state: FormState, action: FormAction): FormState => {
   switch (action.type) {
     case "SET_FIELD":
       return { ...state, [action.field]: action.value };
     case "ADD_ITEM":
       return {
         ...state,
-        [action.field]: [...state[action.field], action.item],
+        [action.field]: [...(state[action.field] as any[]), action.item],
       };
     case "RESET":
       return initialState;
@@ -66,24 +75,19 @@ const RelatorioDiarioObras = () => {
   const [progress, setProgress] = useState(0);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    dispatch({ type: "SET_FIELD", field: name, value });
+    dispatch({ type: "SET_FIELD", field: name as keyof FormState, value });
     calculateProgress();
   };
 
-  const handleDateChange = (date, name) => {
+  const handleDateChange = (date: Date | null, name: keyof FormState) => {
     dispatch({ type: "SET_FIELD", field: name, value: date });
     calculateProgress();
   };
 
-  const handleAddItem = (field, item) => {
+  const handleAddItem = (field: keyof FormState, item: any) => {
     dispatch({ type: "ADD_ITEM", field, item });
-  };
-
-  const handleFileUpload = (e) => {
-    const files = Array.from(e.target.files || []);
-    handleAddItem("fotosProgresso", files);
   };
 
   const calculateProgress = () => {
@@ -94,7 +98,7 @@ const RelatorioDiarioObras = () => {
     setProgress((filledFields.length / totalFields) * 100);
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       const pdfBlob = await generatePDF();
@@ -167,68 +171,65 @@ const RelatorioDiarioObras = () => {
   };
 
   return (
-    <div className="container mx-auto p-4 bg-gray-100">
+    <div className="container mx-auto p-6 bg-gray-50 rounded-lg shadow-lg">
       <form onSubmit={handleSubmit}>
-        <h1 className="text-2xl font-bold mb-4">Relatório Diário de Obras</h1>
+        <h1 className="text-3xl font-bold text-[#af1b1b] mb-6">
+          Relatório Diário de Obras
+        </h1>
 
         {/* Progresso */}
         <ProgressBar progress={progress} />
 
         {/* Dados Gerais */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <InputField
             label="Número do RDO"
             name="numeroRDO"
             value={state.numeroRDO}
             onChange={handleChange}
-            required
           />
           <DatePickerField
             label="Data"
             selected={state.dataRelatorio}
             onChange={(date) => handleDateChange(date, "dataRelatorio")}
-            required
           />
           <InputField
             label="Empresa"
             name="empresa"
             value={state.empresa}
             onChange={handleChange}
-            required
           />
           <InputField
             label="Cliente"
             name="cliente"
             value={state.cliente}
             onChange={handleChange}
-            required
           />
           <InputField
             label="Local da Obra"
             name="localObra"
             value={state.localObra}
             onChange={handleChange}
-            required
           />
           <InputField
             label="Gerência"
             name="gerencia"
             value={state.gerencia}
             onChange={handleChange}
-            required
           />
           <InputField
             label="Responsável pela Obra"
             name="responsavelObra"
             value={state.responsavelObra}
             onChange={handleChange}
-            required
           />
         </div>
 
         {/* Condições Climáticas */}
-        <h3 className="text-lg font-semibold mt-8">Condições Climáticas</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <h3 className="text-lg font-semibold text-gray-700 mt-8">
+          Condições Climáticas
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <InputField
             label="Tempo Manhã"
             name="tempoManha"
@@ -268,8 +269,8 @@ const RelatorioDiarioObras = () => {
         </div>
 
         {/* Efetivo */}
-        <h3 className="text-lg font-semibold mt-8">Efetivo</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <h3 className="text-lg font-semibold text-gray-700 mt-8">Efetivo</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <InputField
             label="Nome do Trabalhador"
             name="efetivo"
@@ -285,8 +286,10 @@ const RelatorioDiarioObras = () => {
         </div>
 
         {/* Equipamentos */}
-        <h3 className="text-lg font-semibold mt-8">Equipamentos Utilizados</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <h3 className="text-lg font-semibold text-gray-700 mt-8">
+          Equipamentos Utilizados
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <InputField
             label="Nome do Equipamento"
             name="equipamentos"
@@ -335,7 +338,7 @@ const RelatorioDiarioObras = () => {
         <div className="flex space-x-4 mt-6">
           <button
             type="submit"
-            className="bg-blue-600 text-white py-2 px-4 rounded"
+            className="bg-[#af1b1b] text-white py-2 px-4 rounded-lg hover:bg-[#cc1f1f] transition-all"
           >
             Gerar PDF
           </button>
@@ -343,7 +346,7 @@ const RelatorioDiarioObras = () => {
             <a
               href={pdfUrl}
               download
-              className="bg-green-600 text-white py-2 px-4 rounded"
+              className="bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-all"
             >
               Baixar PDF
             </a>
@@ -355,39 +358,73 @@ const RelatorioDiarioObras = () => {
 };
 
 // Componentes Auxiliares
-const InputField = ({ label, name, value, onChange }) => (
+type InputFieldProps = {
+  label: string;
+  name: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+};
+
+const InputField: React.FC<InputFieldProps> = ({
+  label,
+  name,
+  value,
+  onChange,
+}) => (
   <div>
-    <label className="block text-sm font-semibold">{label}</label>
+    <label className="block text-sm font-semibold text-gray-700">{label}</label>
     <input
       type="text"
       name={name}
       value={value}
       onChange={onChange}
-      className="w-full p-2 border border-gray-300 rounded mt-2"
+      className="w-full p-2 border border-gray-300 rounded-lg mt-2"
     />
   </div>
 );
 
-const TextareaField = ({ label, name, value, onChange }) => (
+type TextareaFieldProps = {
+  label: string;
+  name: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+};
+
+const TextareaField: React.FC<TextareaFieldProps> = ({
+  label,
+  name,
+  value,
+  onChange,
+}) => (
   <div>
-    <label className="block text-sm font-semibold">{label}</label>
+    <label className="block text-sm font-semibold text-gray-700">{label}</label>
     <textarea
       name={name}
       value={value}
       onChange={onChange}
-      className="w-full p-2 border border-gray-300 rounded mt-2"
+      className="w-full p-2 border border-gray-300 rounded-lg mt-2"
     ></textarea>
   </div>
 );
 
-const DatePickerField = ({ label, selected, onChange }) => (
+type DatePickerFieldProps = {
+  label: string;
+  selected: Date | null;
+  onChange: (date: Date | null) => void;
+};
+
+const DatePickerField: React.FC<DatePickerFieldProps> = ({
+  label,
+  selected,
+  onChange,
+}) => (
   <div>
-    <label className="block text-sm font-semibold">{label}</label>
+    <label className="block text-sm font-semibold text-gray-700">{label}</label>
     <DatePicker
       selected={selected}
       onChange={onChange}
       dateFormat="dd/MM/yyyy"
-      className="w-full p-2 border border-gray-300 rounded mt-2"
+      className="w-full p-2 border border-gray-300 rounded-lg mt-2"
     />
   </div>
 );
