@@ -85,7 +85,7 @@ const NavigationMenu = () => {
         onClick={() => router.push("/profile")}
         className="flex flex-col items-center text-gray-600 hover:text-indigo-600 cursor-pointer"
       >
-       <svg
+        <svg
           className="icon"
           stroke="currentColor"
           fill="currentColor"

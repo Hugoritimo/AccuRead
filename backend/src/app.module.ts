@@ -1,5 +1,3 @@
-/* eslint-disable prettier/prettier */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Module, OnModuleInit } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UserSeeds } from './seeds/user.seeds';
@@ -9,16 +7,34 @@ import { PdfController } from './pdfgenerator/generatepdf.controller';
 import { ExcelService } from './generatexlsx.service';
 import { ExcelController } from './generatexlsx.controller';
 
+// Sugestão: separar a lógica de seed em um módulo próprio `SeedsModule`
 @Module({
-  imports: [AuthModule],
-  providers: [UsersService, UserSeeds, PdfService, ExcelService],
-  controllers: [PdfController, ExcelController],
-  exports: [UsersService],
+  imports: [
+    AuthModule,
+    // Outros módulos que você precisar importar globalmente
+  ],
+  providers: [
+    UsersService,
+    UserSeeds,
+    PdfService,
+    ExcelService,
+  ],
+  controllers: [
+    PdfController,
+    ExcelController,
+  ],
+  exports: [
+    UsersService,
+  ],
 })
 export class AppModule implements OnModuleInit {
   constructor(private readonly userSeeds: UserSeeds) { }
 
+  // Sugestão: Rodar o processo de seed apenas quando necessário (não em produção)
   async onModuleInit() {
-    await this.userSeeds.seedUsers();
+    // Adicione uma condição para rodar o seed apenas em desenvolvimento
+    if (process.env.NODE_ENV !== 'production') {
+      await this.userSeeds.seedUsers();
+    }
   }
 }
