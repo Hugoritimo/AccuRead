@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { Injectable } from '@nestjs/common';
-import { UsersService } from '../users.service';
+import { UsersService } from './user.service';
 
 @Injectable()
 export class UserSeeds {

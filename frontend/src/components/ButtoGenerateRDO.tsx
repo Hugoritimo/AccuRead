@@ -14,12 +14,18 @@ type RdoProps = {
 };
 
 export function ButtonGenerateRDO(props: RdoProps) {
-  const handleKeyPress = (e: any) => {
-    if (e.key === "Enter") {
-      console.log("You must have pressed Enter ");
-      setDataLocalStorage();
-    }
-  };
+  /*************  ✨ Codeium Command ⭐  *************/
+  /**
+   * Handles key press on button, if Enter is pressed, saves data to localStorage
+   * @param {any} e - key press event
+   */
+  /******  981138ab-d0bc-499c-9fe0-c3672fab56cc  *******/ const handleKeyPress =
+    (e: any) => {
+      if (e.key === "Enter") {
+        console.log("You must have pressed Enter ");
+        setDataLocalStorage();
+      }
+    };
 
   const setDataLocalStorage = () => {
     localStorage.setItem("@number", props.number);

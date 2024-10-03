@@ -23,7 +23,7 @@ const HomePage = () => {
           <FaUser className="mr-2" />
           Perfil
           {/* Lordicon */}
-        </Button>
+         </Button>
       </header>
 
       {/* Main Content */}

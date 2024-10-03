@@ -11,7 +11,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Image from "next/image";
 import Link from "next/link";
-import { setToken } from "@/utils/auth"; // Funções para gerenciamento de token.
+import { setToken } from "@/lib/auth";
 
 export default function LoginPage() {
   const [username, setUsername] = useState<string>("");
@@ -20,12 +20,10 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const router = useRouter();
 
-  // Função chamada ao enviar o formulário.
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Validação para garantir que os campos foram preenchidos.
     if (!username || !password) {
       toast.error("Por favor, preencha todos os campos.");
       setIsLoading(false);
@@ -33,36 +31,33 @@ export default function LoginPage() {
     }
 
     try {
-      // Fazendo a chamada para a API de login.
+      console.log("Enviando dados:", { username, password });
+
       const response = await fetch("http://localhost:3001/auth/login", {
+        // Certifique-se de que a URL está correta
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ user: username, password }), // Ajuste para a estrutura correta do backend
       });
 
-      // Verifica se o login foi bem-sucedido.
       if (response.ok) {
         const result = await response.json();
+        const token = result.token || result.accessToken; // Use o campo correto retornado pelo backend
 
-        // Armazena o token JWT baseado no estado do checkbox "Lembrar-me".
-        if (rememberMe) {
-          localStorage.setItem("token", result.token);
-        } else {
-          sessionStorage.setItem("token", result.token);
-        }
-
+        setToken(token, rememberMe);
         toast.success("Login bem-sucedido!");
 
-        // Redireciona para a página inicial após o login bem-sucedido.
         setTimeout(() => {
           router.push("/home");
         }, 1000);
       } else {
         const result = await response.json();
-        toast.error(result.message || "Nome de usuário ou senha incorretos");
+        const errorMessage =
+          result.message || "Erro ao fazer login. Tente novamente.";
+        toast.error(errorMessage);
       }
     } catch (error) {
-      console.error(error);
+      console.error("Erro na requisição de login:", error);
       toast.error("Erro ao tentar fazer login, tente novamente.");
     } finally {
       setIsLoading(false);

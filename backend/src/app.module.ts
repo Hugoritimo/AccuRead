@@ -1,40 +1,24 @@
-import { Module, OnModuleInit } from '@nestjs/common';
-import { UsersService } from './users.service';
-import { UserSeeds } from './seeds/user.seeds';
+/* eslint-disable prettier/prettier */
+import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { UserModule } from './users/user.module';
 import { AuthModule } from './auth/auth.module';
-import { PdfService } from './pdfgenerator/generatepdf.service';
-import { PdfController } from './pdfgenerator/generatepdf.controller';
-import { ExcelService } from './generatexlsx.service';
-import { ExcelController } from './generatexlsx.controller';
+import { User } from './users/users.entity'; // Corrige a importação da entidade User
 
-// Sugestão: separar a lógica de seed em um módulo próprio `SeedsModule`
 @Module({
   imports: [
-    AuthModule,
-    // Outros módulos que você precisar importar globalmente
-  ],
-  providers: [
-    UsersService,
-    UserSeeds,
-    PdfService,
-    ExcelService,
-  ],
-  controllers: [
-    PdfController,
-    ExcelController,
-  ],
-  exports: [
-    UsersService,
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      host: process.env.DB_HOST,
+      port: parseInt(process.env.DB_PORT),
+      username: process.env.DB_USERNAME,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_DATABASE,
+      entities: [User], // Certifique-se de importar a entidade corretamente
+      synchronize: true,
+    }),
+    UserModule, // Certifique-se de importar o UserModule
+    AuthModule, // Certifique-se de importar o AuthModule
   ],
 })
-export class AppModule implements OnModuleInit {
-  constructor(private readonly userSeeds: UserSeeds) { }
-
-  // Sugestão: Rodar o processo de seed apenas quando necessário (não em produção)
-  async onModuleInit() {
-    // Adicione uma condição para rodar o seed apenas em desenvolvimento
-    if (process.env.NODE_ENV !== 'production') {
-      await this.userSeeds.seedUsers();
-    }
-  }
-}
+export class AppModule { }
