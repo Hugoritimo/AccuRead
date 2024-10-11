@@ -11,7 +11,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Image from "next/image";
 import Link from "next/link";
-import { setToken } from "@/lib/auth";
+import { setToken } from "@/lib/auth"; // Certifique-se que a função está corretamente exportada
 
 export default function LoginPage() {
   const [username, setUsername] = useState<string>("");
@@ -34,7 +34,6 @@ export default function LoginPage() {
       console.log("Enviando dados:", { username, password });
 
       const response = await fetch("http://localhost:3001/auth/login", {
-        // Certifique-se de que a URL está correta
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ user: username, password }), // Ajuste para a estrutura correta do backend
@@ -44,7 +43,7 @@ export default function LoginPage() {
         const result = await response.json();
         const token = result.token || result.accessToken; // Use o campo correto retornado pelo backend
 
-        setToken(token, rememberMe);
+        setToken(token, rememberMe); // Agora `setToken` aceita dois argumentos
         toast.success("Login bem-sucedido!");
 
         setTimeout(() => {
@@ -80,7 +79,7 @@ export default function LoginPage() {
           <CardHeader className="flex flex-col items-center mb-6">
             <Image
               src="/img/projeta.png"
-              alt="Logo"
+              alt="Logo da empresa"
               width={100}
               height={100}
               className="mb-4"
