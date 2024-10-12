@@ -85,7 +85,7 @@ export default function LoginPage() {
               className="mb-4"
             />
             <CardTitle className="text-center text-4xl font-extrabold text-brand-dark dark:text-white">
-              AccuRead RDO
+              ConstruLink
             </CardTitle>
             <p className="text-center text-gray-600 dark:text-gray-300 mt-2">
               Faça login para continuar

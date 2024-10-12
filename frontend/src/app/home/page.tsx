@@ -12,7 +12,7 @@ const HomePage = () => {
     <div className="min-h-screen flex flex-col items-center bg-[#f9f9f9] p-6">
       {/* Header */}
       <header className="w-full max-w-5xl flex justify-between items-center mb-8">
-        <h1 className="text-4xl font-extrabold text-[#af1b1b]">AccuRead</h1>
+        <h1 className="text-4xl font-extrabold text-[#af1b1b]">ConstruLink</h1>
 
         {/* Perfil Button with Lordicon */}
         <Button
@@ -23,7 +23,7 @@ const HomePage = () => {
           <FaUser className="mr-2" />
           Perfil
           {/* Lordicon */}
-         </Button>
+        </Button>
       </header>
 
       {/* Main Content */}
